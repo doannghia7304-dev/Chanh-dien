@@ -201,12 +201,18 @@ async function disconnectTikTok(){ if (tiktok){ try { await tiktok.disconnect();
 
 /* ------------------------------------------------------------- test data */
 const DEMO_NAMES = ['Diệu Hạnh','Minh Tâm','Thiện Đức','Huệ An','Tịnh Nhã','Quảng Trí','Chơn Như','Pháp Hỷ','Nguyên Thanh','Tâm Đăng','Diệu Liên','Trí Hải','Phước Lộc','Hạnh Nguyện','Như Ý','Bảo Châu','Thanh Lương','Từ Tâm','An Lạc','Giác Hoa','Tuệ Minh','Liên Hương','Thu Hà','Ngọc Lan','Đức Anh','Hải Đăng','Mai Anh','Phương Thảo','Trung Kiên','Quang Huy','Bảo Ngọc','Diệu Linh'];
+// Sets the number of demo people to exactly n: adds the missing ones, or sends the extra ones away (newest first).
+// Bots and real viewers are left alone.
 function fillDemo(n){
-  const have = [...viewers.values()].filter(v => v.demo).length;
-  for (let i = have; i < n && viewers.size < capacity(); i++){
+  const demos = [...viewers.keys()].filter(id => id.startsWith('demo_')).sort((a, b) => +b.slice(5) - +a.slice(5));
+  for (const id of demos.slice(0, Math.max(0, demos.length - n))){ viewers.delete(id); broadcast({ t:'leave', id }); }
+  let have = Math.min(n, demos.length);
+  for (let i = 0; have < n && viewers.size < capacity(); i++){
+    if (viewers.has('demo_' + i)) continue;
     const name = DEMO_NAMES[i % DEMO_NAMES.length] + (i >= DEMO_NAMES.length ? ' ' + (Math.floor(i / DEMO_NAMES.length) + 1) : '');
-    seat('demo_' + i, name, { demo: true, skin: DEFAULT_SKINS[i % DEFAULT_SKINS.length] });
+    seat('demo_' + i, name, { demo: true, skin: DEFAULT_SKINS[i % DEFAULT_SKINS.length] }); have++;
   }
+  return have;
 }
 function clearSeats(){ viewers.clear(); broadcast(snapshot()); addLog('Đã làm trống bồ đoàn'); }
 function resetStats(){ for (const k in stats) stats[k] = 0; donors.clear(); lastOffer = null; for (const v of viewers.values()) v.coins = 0; broadcast(snapshot()); addLog('Đã xóa bảng lễ vật và Tấm Lòng Thành'); }
@@ -218,7 +224,7 @@ function onControl(m){
     case 'disconnect': disconnectTikTok(); addLog('Đã ngắt kết nối TikTok'); break;
     case 'chat': { const n = String(m.name || 'Khách').slice(0, 18); onChat('sim_' + n, n, String(m.text || 'Nam mô A Di Đà Phật').slice(0, 120)); break; }
     case 'gift': { const n = String(m.name || 'Khách').slice(0, 18); onGift('sim_' + n, n, String(m.gift || 'Hoa hồng').slice(0, 30), clamp(m.count, 1, 99), clamp(m.diamonds, 1, 50000)); break; }
-    case 'fill': fillDemo(clamp(m.n, 1, MAX_SEATS)); addLog(`Đổ người mẫu: ${viewers.size} người`); break;
+    case 'fill': { const d = fillDemo(clamp(m.n, 0, MAX_SEATS)); addLog(`Người mẫu: ${d} · tổng trong chánh điện: ${viewers.size} người`); break; }
     case 'clear': clearSeats(); break;
     case 'resetStats': resetStats(); break;
     case 'session': resetSession(); addLog(`⏱ Bắt đầu lại khóa lễ ${settings.sessionMin} phút`); break;
