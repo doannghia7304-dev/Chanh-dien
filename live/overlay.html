@@ -116,7 +116,7 @@ const $ = id => document.getElementById(id);
 
 /* ======================= assets ======================= */
 const A = {};
-const IMG = { hall:'/assets/grand_hall.jpg', lotus:'/assets/fx_lotus.png', halo:'/assets/fx_halo.png', bell:'/assets/fx_bell.png', incense:'/assets/fx_incense.png', petal:'/assets/fx_petal.png' };
+const IMG = { hall:'/assets/grand_hall.jpg', abbot:'/assets/abbot.png', lotus:'/assets/fx_lotus.png', halo:'/assets/fx_halo.png', bell:'/assets/fx_bell.png', incense:'/assets/fx_incense.png', petal:'/assets/fx_petal.png' };
 for (const [k,src] of Object.entries(IMG)){ const im=new Image(); im.src=src; A[k]=im; }
 const FX_ICON = { incense:'incense', bow:'halo', lotus:'lotus' };
 const avatars = new Map();
@@ -210,15 +210,33 @@ function addVisitor(p, instant){
   const si = taken.indexOf(null), seat = si >= 0 ? SEATS[si] : null;
   if (seat) taken[si] = p.id;
   const walking = [...visitors.values()].filter(v => v.state==='walk').length;
-  const v = { ...p, seat, state:'walk', x:540+(Math.random()-.5)*60, y:1990, lane:Math.random()-.5, ft:0, step:0, fade:1, sitT:1,
+  const lane = Math.random()-.5;
+  const v = { ...p, seat, state:'walk', x:540+lane*carpetHalf(1990)*.6, y:1990, lane, ft:0, step:0, fade:1, sitT:1,
               glow:0, bow:0, bubble:null, active: instant ? -1e9 : performance.now(), phase:Math.random()*6.28 };   // a newcomer's name shows for a while
   visitors.set(p.id, v);
   if (instant || !seat || walking > 10){ v.state='sit'; v.x=seat?.x ?? 540; v.y=seat?.y ?? 1500; v.fade=instant?1:0; }
 }
 function removeVisitor(id){ const v=visitors.get(id); if (v?.seat) taken[v.seat.idx]=null; visitors.delete(id); }
 
-/* the abbot and two teachers kneel at the head of the carpet */
-const TEACHERS = [ { name:'Sư Trụ Trì', skin:'master', x:540, y:872, master:true }, { name:'Thầy Minh Đạo', skin:'monk', x:478, y:886 }, { name:'Thầy Tâm Từ', skin:'monk', x:602, y:886 } ];
+/* the abbot (painted sprite, larger than life so he reads on a phone) kneels at the head of the carpet, two teachers just behind him */
+const TEACHERS = [ { name:'Thầy Minh Đạo', skin:'monk', x:458, y:858 }, { name:'Thầy Tâm Từ', skin:'monk', x:622, y:858 } ];
+const ABBOT = { name:'Sư Trụ Trì', x:540, y:888, w:112 };
+
+/* donors kneel closest to the Buddha: the biggest giver takes the front row by the carpet, the next one beside them, and so on */
+const PRESTIGE = SEATS.map((s,i)=>i).sort((a,b) => SEATS[a].r-SEATS[b].r || SEATS[a].i-SEATS[b].i || SEATS[a].x-SEATS[b].x);
+function moveTo(v, si, instant){
+  v.seat = SEATS[si]; taken[si] = v.id;
+  if (instant){ v.state='sit'; v.x=v.seat.x; v.y=v.seat.y; return; }
+  if (v.state==='sit'){ v.state='walk'; v.lane=Math.random()-.5; }      // stands up: out to the carpet, along it, then into the row
+}
+function arrange(instant){
+  const donors=[...visitors.values()].filter(v=>v.coins>0 && v.seat).sort((a,b)=>b.coins-a.coins || (a.id<b.id?-1:1));
+  const reserved=new Set(PRESTIGE.slice(0,donors.length)), bumped=[];
+  donors.forEach((v,j) => { v.rank=j; if (taken[v.seat.idx]===v.id) taken[v.seat.idx]=null; });
+  for (const v of visitors.values()) if (!(v.coins>0) && v.seat && reserved.has(v.seat.idx)){ v.rank=Infinity; taken[v.seat.idx]=null; bumped.push(v); }
+  donors.forEach((v,j) => { const si=PRESTIGE[j]; if (v.seat.idx===si){ taken[si]=v.id; } else moveTo(v, si, instant); });
+  for (const v of bumped){ const si=taken.findIndex((id,i)=>id===null && !reserved.has(i)); if (si>=0) moveTo(v, si, instant); }
+}
 
 /* ======================= HUD ======================= */
 let sessionEndsAt = Date.now() + 3600e3, topIds = new Set();
@@ -324,14 +342,14 @@ function connect(){
     switch(m.t){
       case 'state':
         Object.assign(settings,m.settings); applySettings(); if (m.sessionEndsAt) sessionEndsAt=m.sessionEndsAt;
-        visitors.clear(); taken.fill(null); for (const p of m.viewers) addVisitor(p,true);
+        visitors.clear(); taken.fill(null); for (const p of m.viewers) addVisitor(p,true); arrange(true);
         updateCount(); setStats(m.stats); setTop(m.top); setTicker(m.lastOffer); break;
       case 'settings': Object.assign(settings,m.settings); applySettings(); break;
-      case 'join': addVisitor(m.v, m.v.demo && visitors.size>8); updateCount(); break;
-      case 'leave': removeVisitor(m.id); updateCount(); break;
+      case 'join': addVisitor(m.v, m.v.demo && visitors.size>8); if (m.v.coins>0) arrange(); updateCount(); break;
+      case 'leave': { const was=visitors.get(m.id)?.coins>0; removeVisitor(m.id); if (was) arrange(); updateCount(); } break;
       case 'skin': { const v=visitors.get(m.id); if(v){ v.skin=m.skin; v.glow=.8; v.active=now; } } break;
       case 'chat': { const v=visitors.get(m.id); if(v){ v.bubble={text:m.text, at:now, until:now+6000}; v.bow=.6; v.active=now; } } break;
-      case 'gift': { const v=visitors.get(m.id); if(v) v.coins=m.total; giftFx(v,m.tier,m.kind); setStats(m.stats,true); setTop(m.top); setTicker({name:m.name,label:m.label},true); showGift(m); } break;
+      case 'gift': { const v=visitors.get(m.id); if(v) v.coins=m.total; giftFx(v,m.tier,m.kind); arrange(); setStats(m.stats,true); setTop(m.top); setTicker({name:m.name,label:m.label},true); showGift(m); } break;
       case 'stats': setStats(m.stats,true); break;
       case 'session': sessionEndsAt=m.endsAt; break;
       case 'like': hearts(visitors.get(m.id),m.n); break;
@@ -387,7 +405,7 @@ function glow(x,y,r,a){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.
 const smoke = Array.from({length:18}, (_,i) => i/18);
 let last=performance.now();
 function frame(now){
-  requestAnimationFrame(frame); const dt=Math.min((now-last)/1000,.05); last=now; const t=now/1000;
+  requestAnimationFrame(frame); const dt=Math.max(0,Math.min((now-last)/1000,.05)); last=Math.max(last,now); const t=now/1000;
   ctx.clearRect(0,0,1080,1920);
   if (A.hall.naturalWidth) ctx.drawImage(A.hall,0,0,1080,1920);
   // halo behind the Buddha's head, rays after a gift, a light column down to the burner for bigger gifts
@@ -407,16 +425,23 @@ function frame(now){
   // candle flicker on the altar, incense smoke from the burner
   ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.045+.03*Math.sin(t*9)*Math.sin(t*13.3); ctx.fillStyle='#ffb347'; ctx.fillRect(0,380,1080,450); ctx.restore();
   ctx.save(); ctx.fillStyle='#efe3cc'; for (let i=0;i<smoke.length;i++){ const a=(t*.08+smoke[i])%1; ctx.globalAlpha=.24*(1-a); ctx.beginPath(); ctx.arc(540+Math.sin(a*7+i)*16*a, 645-a*210, 3+a*13, 0, 6.28); ctx.fill(); } ctx.restore();
-  // teachers at the head of the carpet
-  for (const tc of TEACHERS){ const k=depth(tc.y); if (tc.master) glow(tc.x, tc.y-50*k, 90*k, .4+.1*Math.sin(t*1.5)); const top=figure(tc.skin, tc.x, tc.y, k, 'sit', 0, 0); if (tc.master) tag(tc.name, tc.x, tc.y-top-16, 16, true); }
+  // teachers and the abbot at the head of the carpet
+  for (const tc of TEACHERS) figure(tc.skin, tc.x, tc.y, depth(tc.y), 'sit', 0, 0);
+  if (A.abbot.naturalWidth){
+    const w=ABBOT.w, h=w*A.abbot.naturalHeight/A.abbot.naturalWidth, breathe=1+.006*Math.sin(t*1.1);
+    glow(ABBOT.x, ABBOT.y-h*.55, h*1.1, .32+.08*Math.sin(t*1.5));
+    ctx.drawImage(A.abbot, ABBOT.x-w/2, ABBOT.y-h*breathe, w, h*breathe);
+    tag(ABBOT.name, ABBOT.x, ABBOT.y-h-14, 17, true);
+  }
   // worshippers back to front; tags and bubbles are drawn after everyone so nobody hides them
   const list=[...visitors.values()].filter(v=>v.seat).sort((a,b)=>a.y-b.y), showAll=visitors.size<=40, labels=[], talk=[];
   for (const v of list){
     const s=v.seat;
     if (v.state==='walk'){
-      const sp=240*depth(v.y)*dt;
-      if (v.y-s.y>2){ v.y=Math.max(s.y, v.y-sp); v.x+=((540+v.lane*carpetHalf(v.y)*.6)-v.x)*Math.min(1,dt*4); }   // up the carpet
-      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state='sit'; v.sitT=0; } }   // then along the row
+      const sp=240*depth(v.y)*dt, dy=s.y-v.y, lane=540+v.lane*carpetHalf(v.y)*.6;
+      if (Math.abs(dy)>2 && Math.abs(lane-v.x)>8) v.x+=Math.sign(lane-v.x)*Math.min(Math.abs(lane-v.x), sp*1.1);    // out of the row onto the carpet
+      else if (Math.abs(dy)>2){ v.y+=Math.sign(dy)*Math.min(Math.abs(dy), sp); v.x=540+v.lane*carpetHalf(v.y)*.6; }  // along the carpet
+      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state='sit'; v.sitT=0; } }   // then into the row
       v.ft+=dt; if (v.ft>.2){ v.ft=0; v.step^=1; }
     } else v.sitT=Math.min(1,v.sitT+dt*2.5);
     v.fade=Math.min(1,v.fade+dt*2); v.glow=Math.max(0,v.glow-dt*.45); v.bow=Math.max(0,v.bow-dt*.7);
@@ -428,8 +453,8 @@ function frame(now){
     const lift = v.state==='walk' ? Math.abs(Math.sin(t*10+v.phase))*2.5*k : (1-v.sitT)*8*k + Math.sin(t*1.1+v.phase)*.8*k;
     const top = figure(v.skin, v.x, v.y, k, v.state, v.step, lift);
     ctx.restore();
-    const fs=Math.max(13,Math.round(19*k)), ty=v.y-top-fs*.9;
-    if (showAll || now-v.active<25000 || topIds.has(v.id)) labels.push([v.active, v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);
+    const fs=Math.max(13,Math.round(19*k)), ty=v.y-top-fs*.9 - (v.rank<10 && v.state==='sit' && (v.rank>>1)&1 ? fs*1.5 : 0);   // neighbouring donors' names step up and down
+    if (showAll || now-v.active<25000 || v.rank<10) labels.push([v.rank<10 ? now+1e6-v.rank : v.active, v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);   // top-10 donors always named, drawn on top
     if (v.bubble && now<v.bubble.until) talk.push([v.bubble.at, v.bubble.text, v.x, ty-fs*.8]); else v.bubble=null;
   }
   labels.sort((a,b)=>a[0]-b[0]).forEach(l=>tag(...l.slice(1)));
