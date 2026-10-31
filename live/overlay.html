@@ -286,6 +286,10 @@ function showChant(text){ $('chantText').textContent=text; const el=$('chant'); 
 let AC=null, master=null, musicGain=null, sfx=null, settings={ music:true, mo:true, moBpm:52 };
 const TRACKS=['/assets/music/music1.mp3','/assets/music/music2.mp3']; let trackIdx=Math.floor(Math.random()*TRACKS.length), musicEl=null;
 $('unmute').onclick = e => { e.currentTarget.remove(); startAudio(); };
+// Browser sources inside streaming apps (TikTok LIVE Studio "Link", OBS) usually allow sound without a click, and there is
+// no way to click them anyway: start straight away there. A normal Chrome window starts suspended and keeps the button.
+setTimeout(() => { try { const probe = new (window.AudioContext||window.webkitAudioContext)(), ok = probe.state === 'running'; probe.close();
+  if (ok && $('unmute')){ $('unmute').remove(); startAudio(); } } catch {} }, 0);
 function startAudio(){
   AC = new (window.AudioContext||window.webkitAudioContext)();
   master = AC.createGain(); master.gain.value=.9; master.connect(AC.destination);
