@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Overlay 9:16 · Chánh Điện Tịnh Tâm</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,500;0,700;1,400&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,500;0,700;1,400&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
 <style>
 /* Overlay for TikTok LIVE Studio / OBS window capture. Everything sits on a 1080×1920 stage scaled to the window. */
 :root{
   --bg:#0c0705; --fg:#f6e9cf; --muted:#c9ad84; --gold:#e2b04f; --gold2:#ffd98a; --red:#7e1d12;
-  --panel:rgba(28,13,7,.78); --line:rgba(226,176,79,.55);
+  --panel:rgba(28,13,7,.8); --line:rgba(226,176,79,.55);
   --display:"Noto Serif",Georgia,serif; --body:"Be Vietnam Pro",system-ui,sans-serif;
   color-scheme:dark;
 }
@@ -18,64 +18,89 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 #stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center;overflow:hidden;background:var(--bg)}
 #c{position:absolute;inset:0;width:1080px;height:1920px}
 .ui{position:absolute;z-index:3}
-/* title plaque */
-#plaque{left:90px;right:90px;top:70px;height:150px;border:3px solid var(--gold);border-radius:28px;
-  background:linear-gradient(180deg,rgba(70,26,10,.92),rgba(30,12,6,.92));box-shadow:0 0 0 6px rgba(0,0,0,.35),0 0 50px rgba(226,176,79,.25) inset;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-#plaque::before,#plaque::after{content:"❁";position:absolute;top:50%;transform:translateY(-50%);font-size:44px;color:var(--gold)}
-#plaque::before{left:34px}#plaque::after{right:34px}
-#title{font-family:var(--display);font-weight:700;font-size:58px;letter-spacing:.06em;color:var(--gold2);text-transform:uppercase;text-shadow:0 2px 0 #3a1406,0 0 20px rgba(255,200,100,.35)}
-#subtitle{font-family:var(--display);font-size:30px;letter-spacing:.12em;color:var(--fg)}
-/* pills */
-#pills{top:244px;left:0;right:0;display:flex;justify-content:center;gap:26px}
-.pill{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:12px 28px;font-size:34px;font-weight:600;display:flex;align-items:center;gap:14px;font-variant-numeric:tabular-nums}
-.pill small{font-size:20px;font-weight:500;color:var(--muted);line-height:1.05}
-.dot{width:18px;height:18px;border-radius:50%;background:#46d36b;box-shadow:0 0 12px #46d36b}
-/* side cards */
-.card{background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:18px 22px;font-size:25px;line-height:1.4;backdrop-filter:blur(4px)}
-#guide{left:24px;top:630px;width:290px}
-#guide div+div{border-top:1px solid rgba(226,176,79,.3);margin-top:10px;padding-top:10px}
-#guide b{color:var(--gold2)}
-#merit{right:24px;top:630px;width:290px;text-align:center}
-#merit h3{margin:0 0 8px;font-family:var(--display);font-size:30px;color:var(--gold2);letter-spacing:.06em}
-#merit ol{margin:0;padding:0;list-style:none;text-align:left;display:grid;gap:6px}
-#merit li{display:flex;justify-content:space-between;gap:10px}
-#merit li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#merit li span:last-child{color:var(--gold2);font-variant-numeric:tabular-nums}
-#merit .empty{color:var(--muted);text-align:center}
-/* chant banner + gift banner */
-#chant{left:110px;right:110px;top:330px;padding:22px 30px;text-align:center;border-radius:24px;border:2px solid var(--gold);
-  background:rgba(40,18,8,.86);opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.panel{background:linear-gradient(180deg,rgba(48,21,8,.88),rgba(20,9,4,.88));border:2px solid var(--line);border-radius:20px;box-shadow:0 8px 28px rgba(0,0,0,.45)}
+/* top-right: session countdown + offering counters (top-left belongs to TikTok's own header) */
+#offer{right:22px;top:250px;width:300px;box-sizing:border-box;padding:14px 18px 12px}
+#title{font-family:var(--display);font-weight:700;font-size:22px;color:var(--gold2);text-align:center;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#subtitle{font-family:var(--display);font-style:italic;font-size:18px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#clock{font:700 60px/1 var(--body);text-align:center;font-variant-numeric:tabular-nums;color:#fff4dc;margin:10px 0 2px;text-shadow:0 0 18px rgba(255,200,110,.35)}
+.lbl{font-size:17px;color:var(--muted);text-align:center;margin-bottom:8px;letter-spacing:.04em}
+.cnt{display:flex;align-items:center;gap:12px;padding:5px 0;border-top:1px solid rgba(226,176,79,.22)}
+.cnt img,.cnt .ic{width:44px;height:44px;object-fit:contain;flex:none}
+.cnt .ic{display:grid;place-items:center;font-size:34px;line-height:1;color:#ff5a7a}
+.cnt b{font:700 30px var(--body);font-variant-numeric:tabular-nums;min-width:66px;color:var(--gold2)}
+.cnt span{font-size:21px;white-space:nowrap}
+.cnt.bump b{animation:bump .6s}
+@keyframes bump{30%{transform:scale(1.3);color:#fff}}
+#people{margin-top:6px;padding-top:8px;border-top:1px solid rgba(226,176,79,.22);text-align:center;font-size:20px}
+#people b{color:var(--gold2);font-variant-numeric:tabular-nums}
+/* bottom: latest offering, price legend, top donors */
+#bar{left:18px;right:18px;bottom:22px;height:206px;display:grid;grid-template-columns:1fr 330px;gap:14px}
+#left{display:grid;grid-template-rows:auto 1fr;gap:10px;min-width:0}
+#ticker{justify-self:center;max-width:100%;box-sizing:border-box;font:600 28px var(--body);padding:8px 28px;border-radius:999px;background:rgba(20,9,4,.84);border:2px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ticker b{color:var(--gold2)}
+#ticker i{font-style:normal;color:var(--fg);margin-left:12px;opacity:.85}
+#ticker.flash{animation:flash 1.4s}
+@keyframes flash{30%{box-shadow:0 0 34px rgba(255,200,100,.85);border-color:var(--gold2)}}
+#legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lg{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 10px}
+.lg img{width:60px;height:60px;object-fit:contain}
+.lg div{display:grid;line-height:1.2}
+.lg small{font:700 18px var(--body);color:var(--gold2);letter-spacing:.05em}
+.lg span{font-size:22px;font-weight:600;white-space:nowrap}
+#board{padding:12px 16px}
+#board h3{margin:0 0 8px;text-align:center;font:700 24px var(--display);letter-spacing:.08em;color:var(--gold2)}
+#board ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;font-size:24px;align-items:center}
+#board .r{font-weight:700;color:var(--gold2);text-align:center}
+#board li:first-child .n{color:var(--gold2);font-weight:600}
+#board .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#board .p{font-variant-numeric:tabular-nums;color:var(--gold2)}
+#board .empty{display:block;text-align:center;color:var(--muted);font-size:22px}
+/* chant + gift banners float over the back rows, below the altar */
+#chant{left:110px;right:110px;top:900px;padding:20px 28px;text-align:center;border-radius:24px;border:2px solid var(--gold);
+  background:rgba(40,18,8,.88);opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
 #chant.show{opacity:1;transform:none}
-#chant h4{margin:0 0 8px;font-family:var(--display);color:var(--gold2);font-size:30px;letter-spacing:.1em}
+#chant h4{margin:0 0 8px;font-family:var(--display);color:var(--gold2);font-size:28px;letter-spacing:.1em}
 #chant p{margin:0;font-family:var(--display);font-style:italic;font-size:30px;line-height:1.45}
-#gift{left:70px;right:70px;top:330px;z-index:5;padding:30px 40px;text-align:center;border-radius:28px;border:3px solid var(--gold2);
+#gift{left:80px;right:80px;top:900px;z-index:5;padding:26px 36px;text-align:center;border-radius:28px;border:3px solid var(--gold2);
   background:radial-gradient(ellipse at 50% 0%,rgba(150,40,20,.95),rgba(50,14,6,.95));box-shadow:0 0 60px rgba(255,190,90,.45);
   opacity:0;transform:scale(.85);transition:opacity .45s,transform .45s cubic-bezier(.2,1.4,.4,1)}
 #gift.show{opacity:1;transform:none}
-#gift .who{font-family:var(--display);font-weight:700;font-size:52px;color:var(--gold2)}
-#gift .what{font-size:36px;margin-top:6px}
-#gift .pray{font-family:var(--display);font-style:italic;font-size:32px;color:var(--fg);margin-top:12px;opacity:.95}
+#gift .who{font-family:var(--display);font-weight:700;font-size:50px;color:var(--gold2)}
+#gift .what{font-size:34px;margin-top:6px}
+#gift .pray{font-family:var(--display);font-style:italic;font-size:30px;color:var(--fg);margin-top:12px;opacity:.95}
 /* enable sound (needed once: browsers block autoplay) */
-#unmute{position:absolute;z-index:9;left:50%;top:1540px;transform:translateX(-50%);font:600 36px var(--body);padding:22px 44px;border-radius:24px;border:3px solid var(--gold2);background:var(--red);color:#fff4dc;cursor:pointer}
-#conn{position:absolute;z-index:4;right:16px;bottom:12px;font-size:20px;color:var(--muted);opacity:.6}
-@media (prefers-reduced-motion:reduce){#chant,#gift{transition:none}}
+#unmute{position:absolute;z-index:9;left:50%;top:1440px;transform:translateX(-50%);font:600 36px var(--body);padding:22px 44px;border-radius:24px;border:3px solid var(--gold2);background:var(--red);color:#fff4dc;cursor:pointer}
+#conn{position:absolute;z-index:4;left:16px;top:12px;font-size:20px;color:var(--muted);opacity:.7}
+@media (prefers-reduced-motion:reduce){#chant,#gift{transition:none}.cnt.bump b,#ticker.flash{animation:none}}
 </style>
 </head>
 <body>
 <div id="fit"><div id="stage">
   <canvas id="c" width="1080" height="1920"></canvas>
-  <div id="plaque" class="ui"><div id="title">Chánh Điện Tịnh Tâm</div><div id="subtitle">Nam Mô A Di Đà Phật</div></div>
-  <div id="pills" class="ui">
-    <div class="pill"><span class="dot"></span><span id="count">0/24</span><small>đang<br>thiền</small></div>
-    <div class="pill">⏱ <span id="timer">00:00:00</span></div>
+  <div id="offer" class="panel ui">
+    <div id="title">Chánh Điện Tịnh Tâm</div>
+    <div id="subtitle">Nam Mô A Di Đà Phật</div>
+    <div id="clock">60:00</div>
+    <div class="lbl">KHÓA LỄ CÒN LẠI</div>
+    <div class="cnt" id="c_incense"><img src="/assets/fx_incense.png" alt=""><b>0</b><span>Dâng hương</span></div>
+    <div class="cnt" id="c_bow"><img src="/assets/fx_halo.png" alt=""><b>0</b><span>Lễ Phật</span></div>
+    <div class="cnt" id="c_lotus"><img src="/assets/fx_lotus.png" alt=""><b>0</b><span>Hoa sen</span></div>
+    <div class="cnt" id="c_likes"><span class="ic">♥</span><b>0</b><span>Thả tim</span></div>
+    <div id="people"><b id="count">0</b> người đang lễ</div>
   </div>
-  <div id="guide" class="card ui">
-    <div>💬 <b>Bình luận bất kỳ</b> để vào thiền</div>
-    <div>Gõ <b>nam · nữ · sư · ni · tiểu · bà · cao tăng</b> để đổi hình</div>
-    <div>🎁 Tặng quà được <b>xướng tên hồi hướng</b></div>
+  <div id="bar" class="ui">
+    <div id="left">
+      <div id="ticker"><b id="tkName">Nam Mô A Di Đà Phật</b><i id="tkWhat">tùy hỷ công đức</i></div>
+      <div id="legend">
+        <div class="lg panel"><img src="/assets/fx_incense.png" alt=""><div><small>1 COIN</small><span>Dâng hương</span></div></div>
+        <div class="lg panel"><img src="/assets/fx_halo.png" alt=""><div><small>5 COINS</small><span>Lễ Phật</span></div></div>
+        <div class="lg panel"><img src="/assets/fx_lotus.png" alt=""><div><small>10+ COINS</small><span>Hoa sen</span></div></div>
+      </div>
+    </div>
+    <div id="board" class="panel"><h3>TẤM LÒNG THÀNH</h3><ol id="boardList"><li class="empty">Chưa có</li></ol></div>
   </div>
-  <div id="merit" class="card ui"><h3>✦ Công Đức ✦</h3><ol id="meritList"><li class="empty">Chưa có</li></ol></div>
   <div id="chant" class="ui"><h4>✦ TỤNG KINH ĐỊNH KỲ ✦</h4><p id="chantText"></p></div>
   <div id="gift" class="ui"><div class="who" id="giftWho"></div><div class="what" id="giftWhat"></div><div class="pray" id="giftPray"></div></div>
   <button id="unmute">🔔 Bấm để bật âm thanh</button>
@@ -87,84 +112,156 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 const stage = document.getElementById('stage');
 function fit(){ const s = Math.min(innerWidth/1080, innerHeight/1920); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
 addEventListener('resize', fit); fit();
+const $ = id => document.getElementById(id);
 
 /* ======================= assets ======================= */
 const A = {};
-const IMG = { hall:'/assets/hall.jpg', monk:'/assets/c_monk.png', nun:'/assets/c_nun.png', granny:'/assets/c_granny.png', man:'/assets/c_man.png',
-  woman:'/assets/c_woman.png', child:'/assets/c_child.png', anim_man:'/assets/anim_man.png', anim_woman:'/assets/anim_woman.png', anim_granny:'/assets/anim_granny.png',
-  lotus:'/assets/fx_lotus.png', halo:'/assets/fx_halo.png', bell:'/assets/fx_bell.png', incense:'/assets/fx_incense.png', petal:'/assets/fx_petal.png' };
+const IMG = { hall:'/assets/grand_hall.jpg', lotus:'/assets/fx_lotus.png', halo:'/assets/fx_halo.png', bell:'/assets/fx_bell.png', incense:'/assets/fx_incense.png', petal:'/assets/fx_petal.png' };
 for (const [k,src] of Object.entries(IMG)){ const im=new Image(); im.src=src; A[k]=im; }
-const ANIM = { man:{fw:212,fh:300,seatH:210}, woman:{fw:212,fh:300,seatH:220}, granny:{fw:195,fh:300,seatH:222} };
-const hasAnim = k => ANIM[k] && A['anim_'+k]?.naturalWidth > 0;
+const FX_ICON = { incense:'incense', bow:'halo', lotus:'lotus' };
 const avatars = new Map();
 function avatar(url){ if(!url) return null; let im=avatars.get(url); if(!im){ im=new Image(); im.referrerPolicy='no-referrer'; im.src=url; avatars.set(url,im); } return im.naturalWidth?im:null; }
 
+/* ======================= worshipper sprites ======================= */
+// Small figures seen from behind, facing the Buddha. Painted once per outfit into offscreen canvases, then scaled per seat.
+const SKINS = {
+  man:    { robe:'#a7a3c4', dark:'#67628a', hair:'#2a211c' },
+  woman:  { robe:'#9ea8cc', dark:'#5f6995', hair:'#1d1612', bun:true },
+  granny: { robe:'#80563a', dark:'#4c301d', hair:'#bdb6ad', bun:true },
+  monk:   { robe:'#c99a3c', dark:'#85601e' },
+  nun:    { robe:'#9d9c99', dark:'#61605d' },
+  child:  { robe:'#b8b2d2', dark:'#767096', small:true },
+  master: { robe:'#de7d22', dark:'#93441a', sash:'#a8361a' },
+};
+const SKIN_C = '#e8c29b', SKIN_D = '#b4855e', RES = 1.6;     // RES: sprite pixels per unit, enough for the front row
+function tint(hex, k){ const n=parseInt(hex.slice(1),16), f=c=>Math.round(c+(255-c)*k); return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`; }
+function head(g, y, r, o){
+  g.fillStyle=SKIN_D; g.fillRect(-r*.36, y+r*.5, r*.72, r*.75);                       // neck
+  for (const s of [-1,1]){ g.beginPath(); g.ellipse(s*r*.96, y+r*.12, r*.24, r*.32, 0, 0, 6.29); g.fill(); }   // ears
+  const gr=g.createRadialGradient(-r*.35, y-r*.4, r*.1, 0, y, r*1.05);
+  gr.addColorStop(0, o.hair ? tint(o.hair,.25) : SKIN_C); gr.addColorStop(1, o.hair || SKIN_D);
+  g.fillStyle=gr; g.beginPath(); g.arc(0, y, r, 0, 6.29); g.fill();
+  if (o.bun){ g.fillStyle=o.hair; g.beginPath(); g.arc(0, y+r*.45, r*.5, 0, 6.29); g.fill(); g.fillStyle='rgba(255,255,255,.14)'; g.beginPath(); g.arc(-r*.15, y+r*.32, r*.2, 0, 6.29); g.fill(); }
+  else if (!o.hair){ g.fillStyle='rgba(70,60,80,.18)'; g.beginPath(); g.arc(0, y, r, Math.PI*1.08, Math.PI*1.92); g.fill(); }   // shaved: faint stubble on the crown
+}
+function robeFolds(g, o, top, bottom, spread){
+  g.strokeStyle=o.dark; g.globalAlpha=.5; g.lineWidth=2;
+  for (const x of [-1,0,1]){ g.beginPath(); g.moveTo(x*spread*.35, top); g.quadraticCurveTo(x*spread*.75, (top+bottom)/2, x*spread, bottom-3); g.stroke(); }
+  g.globalAlpha=1;
+}
+function paintKneel(o){
+  const c=document.createElement('canvas'); c.width=110*RES; c.height=110*RES; const g=c.getContext('2d');
+  g.scale(RES,RES); g.translate(55,104);                                               // origin: bottom centre
+  g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(0,0,47,7,0,0,6.29); g.fill();
+  const gr=g.createLinearGradient(-30,-70,30,0); gr.addColorStop(0,tint(o.robe,.22)); gr.addColorStop(1,o.dark);
+  g.fillStyle=gr; g.beginPath(); g.moveTo(-44,-2); g.bezierCurveTo(-49,-30,-35,-58,-22,-66); g.quadraticCurveTo(0,-74,22,-66); g.bezierCurveTo(35,-58,49,-30,44,-2); g.quadraticCurveTo(0,5,-44,-2); g.fill();
+  robeFolds(g, o, -62, 0, 30);
+  if (o.sash){ g.fillStyle=o.sash; g.beginPath(); g.moveTo(-22,-66); g.lineTo(-8,-70); g.lineTo(40,-8); g.lineTo(26,-2); g.closePath(); g.fill(); }
+  g.fillStyle='#3a2a20'; for (const s of [-1,1]){ g.beginPath(); g.ellipse(s*12,-2,8,4,0,0,6.29); g.fill(); }   // soles of the feet
+  g.fillStyle=o.dark; g.beginPath(); g.ellipse(0,-67,12,5,0,0,6.29); g.fill();         // collar
+  head(g, -81, 15, o);
+  return c;
+}
+function paintWalk(o, step){
+  const c=document.createElement('canvas'); c.width=90*RES; c.height=160*RES; const g=c.getContext('2d');
+  g.scale(RES,RES); g.translate(45,154);
+  g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(0,0,28,6,0,0,6.29); g.fill();
+  g.fillStyle='#3a2a20'; g.beginPath(); g.ellipse(step?9:-9, -3, 7, 4, 0, 0, 6.29); g.fill();   // the foot that is down
+  const sway = step ? 3 : -3;
+  const gr=g.createLinearGradient(-24,-115,24,0); gr.addColorStop(0,tint(o.robe,.22)); gr.addColorStop(1,o.dark);
+  g.fillStyle=gr; g.beginPath(); g.moveTo(-30+sway,-6); g.bezierCurveTo(-31,-50,-28,-96,-20,-112); g.quadraticCurveTo(0,-120,20,-112); g.bezierCurveTo(28,-96,31,-50,30+sway,-6); g.quadraticCurveTo(0,-1,-30+sway,-6); g.fill();
+  g.fillStyle=o.dark; g.globalAlpha=.35; for (const s of [-1,1]){ g.beginPath(); g.ellipse(s*22,-80,7,26,s*.08,0,6.29); g.fill(); } g.globalAlpha=1;   // sleeves
+  robeFolds(g, o, -105, -4, 22);
+  if (o.sash){ g.fillStyle=o.sash; g.beginPath(); g.moveTo(-18,-112); g.lineTo(-6,-116); g.lineTo(28,-40); g.lineTo(18,-34); g.closePath(); g.fill(); }
+  g.fillStyle=o.dark; g.beginPath(); g.ellipse(0,-113,11,4.5,0,0,6.29); g.fill();
+  head(g, -127, 14, o);
+  return c;
+}
+const SPR = {};
+for (const [k,o] of Object.entries(SKINS)) SPR[k] = { kneel: paintKneel(o), walk: [paintWalk(o,0), paintWalk(o,1)] };
+
 /* ======================= seats ======================= */
-// Floor trapezoid in the painting: back row just below the altar, front row near the bottom.
-const FLOOR = { yTop: 1215, yBot: 1845, halfTop: 290, halfBot: 430 };
-const GRID = { 24:[6,4], 36:[6,6], 64:[8,8], 100:[10,10] };
-let cap = 24, seats = [];
-function layout(c){
-  cap = c; const [cols, rows] = GRID[c] || GRID[24]; seats = [];
-  for (let r=0;r<rows;r++){
-    const t = rows===1 ? .5 : r/(rows-1);                     // 0 = back row
-    const y = FLOOR.yTop + (FLOOR.yBot-FLOOR.yTop)*t;
-    const half = FLOOR.halfTop + (FLOOR.halfBot-FLOOR.halfTop)*t;
-    const scale = (.26 + .24*t) * (6/cols) ** .75;
-    const gap = 2*half/(cols-1) * .93;                        // room for one name tag
-    for (let k=0;k<cols;k++){
-      let u = (k-(cols-1)/2)/((cols-1)/2); u = Math.sign(u)*(.14 + .86*Math.abs(u));   // open a centre aisle
-      seats.push({ x: 540 + u*half, y, scale, r, k, rows, gap });
-    }
+// Perspective of the painting: the carpet edges meet at y=376, the floor starts around y=830.
+const VP = 376;
+const depth = y => (y-VP)/1000;                       // 1 ≈ size of the front rows
+const carpetHalf = y => .1936*(y-VP);
+const UNIT = .66;                                     // sprite unit → px at depth 1
+const SEATS = [];
+(function buildSeats(){
+  let y = 900, r = 0;
+  while (y <= 1690){
+    const k = depth(y), cg = 64*k, xin = 540 + carpetHalf(y) + .62*cg, xout = (y < 935 ? 955 : 1062) - .5*cg;   // pillars stand in the back corners
+    const n = Math.floor((xout-xin)/cg) + 1;
+    for (let i=0;i<n;i++) for (const side of [-1,1]) SEATS.push({ x: 540 + side*(xin-540+i*cg), y, k, r, i });
+    r++; y += 54*k;
   }
-  // fill front rows first, aisle side first, so a small crowd still looks full on camera
-  seats.sort((a,b)=> (b.r-a.r) || (Math.abs(a.x-540)-Math.abs(b.x-540)));
-  reseat();
-}
+  // fill outward from the middle of the floor, carpet side first, so a small crowd still reads as a full hall
+  // and the last free seats are the far corners of the back rows rather than the front
+  const focus = Math.round(r*.5);
+  SEATS.sort((a,b) => (Math.abs(a.r-focus) + a.i*1.25) - (Math.abs(b.r-focus) + b.i*1.25) || a.y-b.y);
+  SEATS.forEach((s,i) => s.idx = i);
+})();
+const taken = new Array(SEATS.length).fill(null);
+
 const visitors = new Map();  // id -> visitor
-let order = [];               // ids in seating order
-function reseat(){
-  order = order.filter(id => visitors.has(id));
-  order.forEach((id,i) => { const v = visitors.get(id), s = seats[i]; if (!v || !s) return; v.seat = s; if (v.state==='sit') { v.tx = s.x; v.ty = s.y; } });
-}
-document.getElementById('count').textContent = '0/24';
-
-/* the three fixed teachers in front of the altar */
-const TEACHERS = [ { name:'Thầy Minh Đạo', skin:'monk', x:300, y:1085, s:.36 }, { name:'Sư Trụ Trì', skin:'monk', x:540, y:1100, s:.4, master:true }, { name:'Thầy Tâm Từ', skin:'monk', x:780, y:1085, s:.36 } ];
-
 function addVisitor(p, instant){
-  if (visitors.has(p.id)) { Object.assign(visitors.get(p.id), { name:p.name, skin:p.skin, avatar:p.avatar, coins:p.coins }); return; }
-  const v = { ...p, state:'walk', x:540, y:2020, tx:0, ty:0, frame:0, ft:0, sitT:0, flip:false, fade:0, bubble:null, glow:0, bow:0, phase:Math.random()*6.28 };
-  visitors.set(p.id, v); order.push(p.id); reseat();
-  if (instant || !hasAnim(v.skin) || !v.seat){ v.state='sit'; v.frame=7; v.x=v.tx=v.seat?.x||540; v.y=v.ty=v.seat?.y||1500; v.fade = instant?1:0; }
+  const old = visitors.get(p.id);
+  if (old){ Object.assign(old, { name:p.name, skin:p.skin, avatar:p.avatar, coins:p.coins }); return; }
+  const si = taken.indexOf(null), seat = si >= 0 ? SEATS[si] : null;
+  if (seat) taken[si] = p.id;
+  const walking = [...visitors.values()].filter(v => v.state==='walk').length;
+  const v = { ...p, seat, state:'walk', x:540+(Math.random()-.5)*60, y:1990, lane:Math.random()-.5, ft:0, step:0, fade:1, sitT:1,
+              glow:0, bow:0, bubble:null, active: instant ? -1e9 : performance.now(), phase:Math.random()*6.28 };   // a newcomer's name shows for a while
+  visitors.set(p.id, v);
+  if (instant || !seat || walking > 10){ v.state='sit'; v.x=seat?.x ?? 540; v.y=seat?.y ?? 1500; v.fade=instant?1:0; }
 }
-function removeVisitor(id){ visitors.delete(id); reseat(); }
+function removeVisitor(id){ const v=visitors.get(id); if (v?.seat) taken[v.seat.idx]=null; visitors.delete(id); }
+
+/* the abbot and two teachers kneel at the head of the carpet */
+const TEACHERS = [ { name:'Sư Trụ Trì', skin:'master', x:540, y:872, master:true }, { name:'Thầy Minh Đạo', skin:'monk', x:478, y:886 }, { name:'Thầy Tâm Từ', skin:'monk', x:602, y:886 } ];
 
 /* ======================= HUD ======================= */
-let startedAt = Date.now();
-function updateCount(){ document.getElementById('count').textContent = `${visitors.size}/${cap}`; }
-function renderMerit(){
-  const top = [...visitors.values()].filter(v=>v.coins>0).sort((a,b)=>b.coins-a.coins).slice(0,5);
-  const ol = document.getElementById('meritList'); ol.innerHTML='';
-  if (!top.length){ ol.innerHTML='<li class="empty">Chưa có</li>'; return; }
-  top.forEach((v,i)=>{ const li=document.createElement('li'); const a=document.createElement('span'); a.textContent=`${i+1}. ${v.name}`; const b=document.createElement('span'); b.textContent=v.coins; li.append(a,b); ol.append(li); });
+let sessionEndsAt = Date.now() + 3600e3, topIds = new Set();
+function updateCount(){ $('count').textContent = visitors.size; }
+const fmt = n => n >= 10000 ? (n/1000).toFixed(n >= 100000 ? 0 : 1).replace('.', ',') + 'K' : String(n);
+function setStats(st, bump){
+  for (const k of ['incense','bow','lotus','likes']){
+    const row = $('c_'+k), b = row.querySelector('b'), txt = fmt(st?.[k] || 0);
+    if (b.textContent === txt) continue;
+    b.textContent = txt;
+    if (bump){ row.classList.remove('bump'); void row.offsetWidth; row.classList.add('bump'); }
+  }
 }
-setInterval(()=>{ const s=Math.floor((Date.now()-startedAt)/1000); document.getElementById('timer').textContent=[s/3600,s/60%60,s%60].map(x=>String(Math.floor(x)).padStart(2,'0')).join(':'); },1000);
+function setTop(top){
+  const ol = $('boardList'); ol.textContent = ''; topIds = new Set((top||[]).map(d => d.id));
+  if (!top?.length){ const li=document.createElement('li'); li.className='empty'; li.textContent='Chưa có'; ol.append(li); return; }
+  top.forEach((d,i) => { const li=document.createElement('li');
+    for (const [cls,txt] of [['r', i+1], ['n', d.name], ['p', fmt(d.coins)]]){ const s=document.createElement('span'); s.className=cls; s.textContent=txt; li.append(s); }
+    ol.append(li); });
+}
+function setTicker(o, flash){
+  if (!o) return; $('tkName').textContent = o.name; $('tkWhat').textContent = o.label;
+  if (flash){ const el=$('ticker'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+}
+setInterval(() => {
+  const s = Math.max(0, Math.round((sessionEndsAt-Date.now())/1000)), p = x => String(Math.floor(x)).padStart(2,'0');
+  $('clock').textContent = s >= 3600 ? `${Math.floor(s/3600)}:${p(s/60%60)}:${p(s%60)}` : `${p(s/60)}:${p(s%60)}`;
+}, 500);
 let giftHide=null;
 function showGift(m){
-  document.getElementById('giftWho').textContent = m.name;
-  document.getElementById('giftWhat').textContent = `thành tâm dâng ${m.giftName}${m.count>1?' ×'+m.count:''} · công đức ${m.total}`;
-  document.getElementById('giftPray').textContent = '“' + m.prayer + '”';
-  document.getElementById('chant').classList.remove('show');
-  const el=document.getElementById('gift'); el.classList.add('show'); clearTimeout(giftHide); giftHide=setTimeout(()=>el.classList.remove('show'), m.tier>=3?9000:6500);
+  $('giftWho').textContent = m.name;
+  $('giftWhat').textContent = `${m.label} · ${m.giftName}${m.count>1?' ×'+m.count:''} · công đức ${m.total}`;
+  $('giftPray').textContent = '“' + m.prayer + '”';
+  $('chant').classList.remove('show');
+  const el=$('gift'); el.classList.add('show'); clearTimeout(giftHide); giftHide=setTimeout(()=>el.classList.remove('show'), m.tier>=3?9000:6500);
 }
 let chantHide=null;
-function showChant(text){ document.getElementById('chantText').textContent=text; const el=document.getElementById('chant'); el.classList.add('show'); clearTimeout(chantHide); chantHide=setTimeout(()=>el.classList.remove('show'), 14000); }
+function showChant(text){ $('chantText').textContent=text; const el=$('chant'); el.classList.add('show'); clearTimeout(chantHide); chantHide=setTimeout(()=>el.classList.remove('show'), 14000); }
 
 /* ======================= audio ======================= */
 let AC=null, master=null, musicGain=null, sfx=null, settings={ music:true, mo:true, moBpm:52 };
 const TRACKS=['/assets/music/music1.mp3','/assets/music/music2.mp3']; let trackIdx=Math.floor(Math.random()*TRACKS.length), musicEl=null;
-document.getElementById('unmute').onclick = e => { e.currentTarget.remove(); startAudio(); };
+$('unmute').onclick = e => { e.currentTarget.remove(); startAudio(); };
 function startAudio(){
   AC = new (window.AudioContext||window.webkitAudioContext)();
   master = AC.createGain(); master.gain.value=.9; master.connect(AC.destination);
@@ -180,9 +277,9 @@ function nextTrack(){
 function duck(on){ if(!musicGain) return; const t=AC.currentTime, target = !settings.music ? 0 : on ? .14 : .5; musicGain.gain.cancelScheduledValues(t); musicGain.gain.setValueAtTime(musicGain.gain.value,t); musicGain.gain.linearRampToValueAtTime(target,t+.5); }
 let haloPulse=0;
 function bell(big){
+  haloPulse=1;
   if(!AC) return; const t=AC.currentTime, k=big?1.7:1;
   for (const [f,a,d] of [[216,.55,7],[432,.35,5],[1296,.12,3],[2160,.05,2]]) { const o=AC.createOscillator(); o.type='sine'; o.frequency.value=f*(big?.75:1); const g=AC.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(a*k*.7,t+.015); g.gain.exponentialRampToValueAtTime(.0005,t+d*k); o.connect(g); g.connect(sfx); o.start(t); o.stop(t+d*k+.1); }
-  haloPulse=1;
 }
 function mo(){
   if(!AC) return; const t=AC.currentTime;
@@ -203,117 +300,146 @@ function playTTS(){
 
 /* ======================= effects ======================= */
 const fx=[], petals=[];
-function giftFx(v, tier){
-  v.glow=1; v.bow=1;
-  const kind = tier>=3?'bell':tier>=2?'lotus':'incense', s=v.seat?.scale||.4;
-  fx.push({kind, x:v.x, y:v.y-220*s, t:0, life: tier>=3?3.4:2.4, scale: s*(tier>=3?1.5:1.1)});
-  for (let i=0;i<(tier>=3?22:tier>=2?10:4);i++) petals.push({x:v.x+(Math.random()-.5)*120, y:v.y-80, vx:(Math.random()-.5)*40, vy:-(70+Math.random()*90), t:0, life:2.6+Math.random(), s:.16+Math.random()*.14});
-  if (tier>=3){ bell(true); for (let i=0;i<30;i++) petals.push({x:540+(Math.random()-.5)*600, y:300+Math.random()*250, vx:(Math.random()-.5)*40, vy:30+Math.random()*50, t:0, life:5, s:.2+Math.random()*.15}); }
+let rays=0, beam=0;          // Buddha's halo rays and the light column down to the incense burner, both fade out
+function giftFx(v, tier, kind){
+  rays = Math.max(rays, tier>=3 ? 1 : tier>=2 ? .75 : .4); if (tier>=2) beam = 1;
+  if (!v) return;
+  v.glow=1; v.bow=1; v.active=performance.now();
+  const k=v.seat?.k || .8;
+  fx.push({ kind: tier>=3 ? 'bell' : FX_ICON[kind] || 'incense', x:v.x, y:v.y-110*UNIT*k, t:0, life: tier>=3?3.4:2.4, scale: k*(tier>=3?.75:.55) });
+  for (let i=0;i<(tier>=3?22:tier>=2?10:4);i++) petals.push({x:v.x+(Math.random()-.5)*100*k, y:v.y-60*k, vx:(Math.random()-.5)*40, vy:-(70+Math.random()*90), t:0, life:2.6+Math.random(), s:.1+Math.random()*.1});
+  if (tier>=3){ bell(true); for (let i=0;i<30;i++) petals.push({x:540+(Math.random()-.5)*700, y:120+Math.random()*250, vx:(Math.random()-.5)*40, vy:30+Math.random()*50, t:0, life:5, s:.16+Math.random()*.12}); }
 }
-function hearts(v,n){ for (let i=0;i<Math.min(6,n);i++) petals.push({x:v.x+(Math.random()-.5)*60, y:v.y-140*(v.seat?.scale||.4), vx:(Math.random()-.5)*20, vy:-(50+Math.random()*40), t:0, life:1.6, s:.08, heart:true}); }
+function hearts(v,n){ if (!v) return; const k=v.seat?.k || .8; for (let i=0;i<Math.min(6,n);i++) petals.push({x:v.x+(Math.random()-.5)*50*k, y:v.y-100*UNIT*k, vx:(Math.random()-.5)*20, vy:-(50+Math.random()*40), t:0, life:1.6, s:.08, heart:true, size:Math.max(18,34*k)}); }
 
 /* ======================= server link ======================= */
 let ws=null;
 function connect(){
   ws = new WebSocket(`ws://${location.host}/ws?role=overlay`);
-  const st=document.getElementById('conn');
+  const st=$('conn');
   ws.onopen=()=>{ st.textContent=''; };
   ws.onclose=()=>{ st.textContent='mất kết nối server… đang thử lại'; setTimeout(connect,2000); };
   ws.onmessage=e=>{
-    const m=JSON.parse(e.data);
+    const m=JSON.parse(e.data), now=performance.now();
     switch(m.t){
       case 'state':
-        Object.assign(settings,m.settings); applySettings(); startedAt=m.startedAt;
-        visitors.clear(); order=[]; layout(m.cap); for (const p of m.viewers) addVisitor(p,true); updateCount(); renderMerit(); break;
-      case 'settings': Object.assign(settings,m.settings); applySettings(); if (m.cap!==cap){ layout(m.cap); updateCount(); } break;
-      case 'join': if (m.cap!==cap) layout(m.cap); addVisitor(m.v, m.v.demo && visitors.size>8); updateCount(); break;
-      case 'leave': removeVisitor(m.id); updateCount(); renderMerit(); break;
-      case 'skin': { const v=visitors.get(m.id); if(v){ v.skin=m.skin; v.glow=.8; if(v.state!=='sit'){ v.state='sit'; v.frame=7; } } } break;
-      case 'chat': { const v=visitors.get(m.id); if(v){ v.bubble={text:m.text, until:performance.now()+6000}; v.bow=.6; } } break;
-      case 'gift': { const v=visitors.get(m.id); if(v){ v.coins=m.total; giftFx(v,m.tier); } renderMerit(); showGift(m); } break;
-      case 'like': { const v=visitors.get(m.id); if(v) hearts(v,m.n); } break;
+        Object.assign(settings,m.settings); applySettings(); if (m.sessionEndsAt) sessionEndsAt=m.sessionEndsAt;
+        visitors.clear(); taken.fill(null); for (const p of m.viewers) addVisitor(p,true);
+        updateCount(); setStats(m.stats); setTop(m.top); setTicker(m.lastOffer); break;
+      case 'settings': Object.assign(settings,m.settings); applySettings(); break;
+      case 'join': addVisitor(m.v, m.v.demo && visitors.size>8); updateCount(); break;
+      case 'leave': removeVisitor(m.id); updateCount(); break;
+      case 'skin': { const v=visitors.get(m.id); if(v){ v.skin=m.skin; v.glow=.8; v.active=now; } } break;
+      case 'chat': { const v=visitors.get(m.id); if(v){ v.bubble={text:m.text, at:now, until:now+6000}; v.bow=.6; v.active=now; } } break;
+      case 'gift': { const v=visitors.get(m.id); if(v) v.coins=m.total; giftFx(v,m.tier,m.kind); setStats(m.stats,true); setTop(m.top); setTicker({name:m.name,label:m.label},true); showGift(m); } break;
+      case 'stats': setStats(m.stats,true); break;
+      case 'session': sessionEndsAt=m.endsAt; break;
+      case 'like': hearts(visitors.get(m.id),m.n); break;
       case 'tts': queueTTS(m.url); break;
       case 'chant': showChant(m.text); bell(); break;
-      case 'bell': bell(true); break;
+      case 'bell': bell(true); rays=Math.max(rays,.5); break;
       case 'mo1': mo(); break;
     }
   };
 }
 function applySettings(){
-  document.getElementById('title').textContent=settings.title||'Chánh Điện Tịnh Tâm';
-  document.getElementById('subtitle').textContent=settings.subtitle||'Nam Mô A Di Đà Phật';
+  $('title').textContent=settings.title||'Chánh Điện Tịnh Tâm';
+  $('subtitle').textContent=settings.subtitle||'Nam Mô A Di Đà Phật';
   duck(false); scheduleMo();
 }
 connect();
 
 /* ======================= render ======================= */
-const ctx=document.getElementById('c').getContext('2d');
+const ctx=$('c').getContext('2d');
 function sprite(im,x,y,s,ay=1){ if(!im?.naturalWidth) return; const w=im.naturalWidth*s,h=im.naturalHeight*s; ctx.drawImage(im,x-w/2,y-h*ay,w,h); }
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-function tag(text,x,y,s,style,av,maxW){
-  const fs=Math.max(15,Math.round(30*s/.4)); ctx.font=`600 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
-  const pad=fs*.5; let aw = av?fs*1.15:0;
-  if (maxW){ if (aw && maxW < fs*5) aw=0, av=null; let t=text; while (t.length>2 && ctx.measureText(t).width+pad*2+aw > maxW) t=t.slice(0,-1); if (t!==text) text=t.trimEnd()+'…'; }
-  const w=ctx.measureText(text).width+pad*2+aw, h=fs*1.5;
-  ctx.fillStyle = style==='gold'?'rgba(70,30,8,.92)':'rgba(18,9,5,.72)'; rr(x-w/2,y-h/2,w,h,h/2); ctx.fill();
-  ctx.lineWidth = style==='gold'?3:1.5; ctx.strokeStyle = style==='gold'?'#e2b04f':'rgba(226,176,79,.55)'; ctx.stroke();
-  if (av){ ctx.save(); ctx.beginPath(); ctx.arc(x-w/2+pad*.55+aw/2, y, fs*.5, 0, 6.29); ctx.clip(); ctx.drawImage(av, x-w/2+pad*.55+aw/2-fs*.5, y-fs*.5, fs, fs); ctx.restore(); }
-  ctx.fillStyle = style==='gold'?'#ffd98a':'#f6e9cf'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(text, x+aw/2, y+1);
+function tag(text,x,y,fs,gold,av){
+  ctx.font=`600 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
+  let t=text; while (t.length>2 && ctx.measureText(t).width>fs*8) t=t.slice(0,-1); if (t!==text) t=t.trimEnd()+'…';
+  const pad=fs*.45, aw=av?fs*1.1:0, w=ctx.measureText(t).width+pad*2+aw, h=fs*1.45;
+  ctx.fillStyle = gold?'rgba(70,30,8,.92)':'rgba(14,8,5,.74)'; rr(x-w/2,y-h/2,w,h,h/2); ctx.fill();
+  ctx.lineWidth = gold?2.5:1.2; ctx.strokeStyle = gold?'#e2b04f':'rgba(226,176,79,.45)'; ctx.stroke();
+  if (av){ ctx.save(); ctx.beginPath(); ctx.arc(x-w/2+pad*.5+aw/2, y, fs*.48, 0, 6.29); ctx.clip(); ctx.drawImage(av, x-w/2+pad*.5+aw/2-fs*.48, y-fs*.48, fs*.96, fs*.96); ctx.restore(); }
+  ctx.fillStyle = gold?'#ffd98a':'#f6e9cf'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t, x+aw/2, y+1);
 }
-function bubble(text,x,y,s){
-  const fs=Math.max(18,Math.round(26*s/.4)); ctx.font=`500 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
-  let t=text; while (ctx.measureText(t).width>320 && t.length>4) t=t.slice(0,-2); if (t!==text) t=t.trimEnd()+'…';
-  const w=ctx.measureText(t).width+fs*1.1, h=fs*1.6;
-  ctx.fillStyle='rgba(255,247,230,.95)'; rr(x-w/2,y-h,w,h,fs*.5); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(x-8,y); ctx.lineTo(x+8,y); ctx.lineTo(x,y+10); ctx.fill();
-  ctx.fillStyle='#3a1a08'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t,x,y-h/2+1);
+function bubble(text,x,y,placed){
+  const fs=30; ctx.font=`700 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
+  const lines=[]; let cur='';                                   // wrap to two lines of at most 400px
+  for (const w of String(text).split(/\s+/)){ const n=cur?cur+' '+w:w; if (ctx.measureText(n).width>400 && cur){ lines.push(cur); cur=w; } else cur=n; if (lines.length===2) break; }
+  if (lines.length<2 && cur) lines.push(cur);
+  if (lines.length===2 && ctx.measureText(lines[1]).width>400){ let s=lines[1]; while (s.length>2 && ctx.measureText(s+'…').width>400) s=s.slice(0,-1); lines[1]=s+'…'; }
+  const w=Math.max(...lines.map(l=>ctx.measureText(l).width))+fs*1.1, lh=fs*1.25, h=lh*lines.length+fs*.6;
+  const bx=Math.max(16, Math.min(1064-w, x-w/2)); let by=y-h-12, tail=true;
+  for (let moved=true, n=0; moved && n<8; n++){ moved=false;          // newer bubbles step up over older ones instead of covering them
+    for (const p of placed) if (bx<p.x+p.w && bx+w>p.x && by<p.y+p.h+6 && by+h+6>p.y){ by=p.y-h-8; moved=true; tail=false; } }
+  placed.push({x:bx,y:by,w,h});
+  ctx.fillStyle='rgba(16,9,5,.86)'; rr(bx,by,w,h,14); ctx.fill();
+  if (tail){ ctx.beginPath(); ctx.moveTo(x-10,by+h); ctx.lineTo(x+10,by+h); ctx.lineTo(x,by+h+12); ctx.fill(); }
+  ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  lines.forEach((l,i)=>ctx.fillText(l, bx+w/2, by+fs*.3+lh*(i+.5)+1));
 }
+function figure(skin, x, y, k, state, step, extra){
+  const sp = SPR[skin] || SPR.man, sc = UNIT*k*(SKINS[skin]?.small ? .8 : 1);
+  if (state==='walk'){ const im=sp.walk[step]; ctx.drawImage(im, x-45*sc, y-154*sc-extra, 90*sc, 160*sc); return 140*sc; }
+  ctx.drawImage(sp.kneel, x-55*sc, y-104*sc-extra, 110*sc, 110*sc); return 96*sc;
+}
+function glow(x,y,r,a){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=a; const g=ctx.createRadialGradient(x,y,4,x,y,r); g.addColorStop(0,'rgba(255,205,120,.95)'); g.addColorStop(1,'rgba(255,160,60,0)'); ctx.fillStyle=g; ctx.fillRect(x-r,y-r,r*2,r*2); ctx.restore(); }
+const smoke = Array.from({length:18}, (_,i) => i/18);
 let last=performance.now();
 function frame(now){
   requestAnimationFrame(frame); const dt=Math.min((now-last)/1000,.05); last=now; const t=now/1000;
   ctx.clearRect(0,0,1080,1920);
   if (A.hall.naturalWidth) ctx.drawImage(A.hall,0,0,1080,1920);
-  // light: halo pulse behind the Buddha, candle flicker, incense smoke
-  haloPulse=Math.max(0,haloPulse-dt*.4);
-  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.2+.08*Math.sin(t*1.2)+haloPulse*.5; sprite(A.halo,540,560,2.7+haloPulse*.35,.5); ctx.restore();
-  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.05+.035*Math.sin(t*9)*Math.sin(t*13.3); ctx.fillStyle='#ffb347'; ctx.fillRect(0,300,1080,800); ctx.restore();
-  ctx.save(); ctx.fillStyle='#efe3cc'; for (let i=0;i<16;i++){ const a=(t*.08+i*.0625)%1; ctx.globalAlpha=.28*(1-a); ctx.beginPath(); ctx.arc(540+Math.sin(a*7+i)*20*a, 1000-a*280, 4+a*15, 0, 6.28); ctx.fill(); } ctx.restore();
-  // teachers
-  for (const tc of TEACHERS){ if (tc.master){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.35+.1*Math.sin(t*1.5); sprite(A.halo,tc.x,tc.y-120,.9,.5); ctx.restore(); }
-    sprite(A[tc.skin],tc.x,tc.y,tc.s); tag(tc.name,tc.x,tc.y-tc.s*260-22,tc.s,'gold'); }
-  // visitors back to front
-  const bubbles=[];
-  const list=[...visitors.values()].sort((a,b)=>a.y-b.y);
-  for (const v of list){
-    const anim=hasAnim(v.skin), s=v.seat?.scale||.4;
-    if (v.state==='walk' && v.seat){
-      const depth=(v.y-FLOOR.yTop)/(FLOOR.yBot-FLOOR.yTop), sp=(170+190*Math.max(0,Math.min(1.5,depth)))*dt, dx=v.seat.x-v.x, dy=v.seat.y-v.y;
-      if (Math.abs(dy)>3){ v.y+=Math.max(-sp,Math.min(sp,dy)); v.x+=(540-v.x)*Math.min(1,dt*6); v.flip=false; } else { v.x+=Math.max(-sp,Math.min(sp,dx)); v.flip=dx<0; }
-      v.ft+=dt; if (v.ft>.15){ v.ft=0; v.frame=(v.frame+1)%4; }
-      if (Math.abs(v.x-v.seat.x)<2 && Math.abs(v.y-v.seat.y)<3){ v.x=v.seat.x; v.y=v.seat.y; v.state='sitting'; v.sitT=0; v.flip=false; }
-    } else if (v.state==='sitting'){ v.sitT+=dt; v.frame=4+Math.min(3,Math.floor(v.sitT/.22)); if (v.sitT>.9){ v.state='sit'; v.frame=7; } }
-    else if (v.seat){ v.x+=(v.seat.x-v.x)*Math.min(1,dt*3); v.y+=(v.seat.y-v.y)*Math.min(1,dt*3); }      // glide when the grid grows
-    v.fade=Math.min(1,v.fade+dt*2); v.glow=Math.max(0,v.glow-dt*.45); v.bow=Math.max(0,v.bow-dt*.7);
-    const ws = v.state==='walk' ? (.26+.26*Math.max(0,Math.min(1,(v.y-FLOOR.yTop)/(FLOOR.yBot-FLOOR.yTop)))) * ((6/((GRID[cap]||GRID[24])[0]))**.7) : s;
-    if (v.glow>0 || v.skin==='master'){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=Math.max(v.glow*.75, v.skin==='master'?.35+.1*Math.sin(t*1.6):0);
-      const g=ctx.createRadialGradient(v.x,v.y-110*ws,8,v.x,v.y-110*ws,200*ws); g.addColorStop(0,'rgba(255,205,120,.95)'); g.addColorStop(1,'rgba(255,160,60,0)'); ctx.fillStyle=g; ctx.fillRect(v.x-230*ws,v.y-340*ws,460*ws,400*ws); ctx.restore(); }
-    const breathe = v.state==='sit' ? Math.sin(t*1.1+v.phase)*2*ws : 0, bowK = v.state==='sit' ? Math.sin(Math.min(1,v.bow)*Math.PI)*.04 : 0;
-    ctx.save(); ctx.globalAlpha=v.fade; ctx.translate(v.x,v.y); if (bowK) ctx.transform(1,0,0,1-bowK,0,0);
-    let topY;
-    if (anim){ const a=ANIM[v.skin], k=ws*1.05*260/a.seatH; if (v.flip) ctx.scale(-1,1); ctx.drawImage(A['anim_'+v.skin], v.frame*a.fw,0,a.fw,a.fh, -a.fw*k/2, -a.fh*k+breathe, a.fw*k, a.fh*k); topY=(v.state==='sit'?a.seatH:a.fh*.97)*k; }
-    else { const sk = v.skin==='master'?'monk':v.skin; sprite(A[sk]||A.man,0,breathe,ws*1.05); topY=260*ws; }
+  // halo behind the Buddha's head, rays after a gift, a light column down to the burner for bigger gifts
+  haloPulse=Math.max(0,haloPulse-dt*.4); rays=Math.max(0,rays-dt*.14); beam=Math.max(0,beam-dt*.22);
+  glow(540,170,230,.2+.06*Math.sin(t*1.2)+haloPulse*.35);
+  if (rays>.01){
+    ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(540,170); ctx.rotate(t*.12); ctx.globalAlpha=rays*.8;
+    const g=ctx.createRadialGradient(0,0,50,0,0,560); g.addColorStop(0,'rgba(255,225,140,.95)'); g.addColorStop(1,'rgba(255,200,90,0)'); ctx.fillStyle=g;
+    for (let i=0;i<28;i++){ ctx.rotate(Math.PI*2/28); ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,560,-.04,.04); ctx.closePath(); ctx.fill(); }
     ctx.restore();
-    const ty=v.y-topY-14*ws/.4;
-    tag(v.name, v.x, ty, ws, v.skin==='master'||v.coins>=99?'gold':'', avatar(v.avatar), v.state==='sit' ? v.seat?.gap : 0);
-    if (v.bubble && now<v.bubble.until) bubbles.push([v.bubble.text, v.x, ty-Math.max(18,30*ws/.4), ws]); else v.bubble=null;
   }
-  for (const b of bubbles) bubble(...b);
+  if (beam>.01){
+    ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=beam*.55;
+    const g=ctx.createLinearGradient(0,200,0,800); g.addColorStop(0,'rgba(255,220,130,.9)'); g.addColorStop(1,'rgba(255,190,80,0)'); ctx.fillStyle=g;
+    ctx.beginPath(); ctx.moveTo(512,200); ctx.lineTo(568,200); ctx.lineTo(610,800); ctx.lineTo(470,800); ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  // candle flicker on the altar, incense smoke from the burner
+  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.045+.03*Math.sin(t*9)*Math.sin(t*13.3); ctx.fillStyle='#ffb347'; ctx.fillRect(0,380,1080,450); ctx.restore();
+  ctx.save(); ctx.fillStyle='#efe3cc'; for (let i=0;i<smoke.length;i++){ const a=(t*.08+smoke[i])%1; ctx.globalAlpha=.24*(1-a); ctx.beginPath(); ctx.arc(540+Math.sin(a*7+i)*16*a, 645-a*210, 3+a*13, 0, 6.28); ctx.fill(); } ctx.restore();
+  // teachers at the head of the carpet
+  for (const tc of TEACHERS){ const k=depth(tc.y); if (tc.master) glow(tc.x, tc.y-50*k, 90*k, .4+.1*Math.sin(t*1.5)); const top=figure(tc.skin, tc.x, tc.y, k, 'sit', 0, 0); if (tc.master) tag(tc.name, tc.x, tc.y-top-16, 16, true); }
+  // worshippers back to front; tags and bubbles are drawn after everyone so nobody hides them
+  const list=[...visitors.values()].filter(v=>v.seat).sort((a,b)=>a.y-b.y), showAll=visitors.size<=40, labels=[], talk=[];
+  for (const v of list){
+    const s=v.seat;
+    if (v.state==='walk'){
+      const sp=240*depth(v.y)*dt;
+      if (v.y-s.y>2){ v.y=Math.max(s.y, v.y-sp); v.x+=((540+v.lane*carpetHalf(v.y)*.6)-v.x)*Math.min(1,dt*4); }   // up the carpet
+      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state='sit'; v.sitT=0; } }   // then along the row
+      v.ft+=dt; if (v.ft>.2){ v.ft=0; v.step^=1; }
+    } else v.sitT=Math.min(1,v.sitT+dt*2.5);
+    v.fade=Math.min(1,v.fade+dt*2); v.glow=Math.max(0,v.glow-dt*.45); v.bow=Math.max(0,v.bow-dt*.7);
+    const k=depth(v.y);
+    if (v.glow>0 || v.skin==='master') glow(v.x, v.y-45*k, 75*k, Math.max(v.glow*.4, v.skin==='master'?.22+.06*Math.sin(t*1.6):0));   // the floor is bright already: keep it soft
+    ctx.save(); ctx.globalAlpha=v.fade;
+    const bowK = v.state==='sit' ? Math.sin(Math.min(1,v.bow)*Math.PI)*.07 : 0;
+    if (bowK){ ctx.translate(v.x,v.y); ctx.scale(1,1-bowK); ctx.translate(-v.x,-v.y); }
+    const lift = v.state==='walk' ? Math.abs(Math.sin(t*10+v.phase))*2.5*k : (1-v.sitT)*8*k + Math.sin(t*1.1+v.phase)*.8*k;
+    const top = figure(v.skin, v.x, v.y, k, v.state, v.step, lift);
+    ctx.restore();
+    const fs=Math.max(13,Math.round(19*k)), ty=v.y-top-fs*.9;
+    if (showAll || now-v.active<25000 || topIds.has(v.id)) labels.push([v.active, v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);
+    if (v.bubble && now<v.bubble.until) talk.push([v.bubble.at, v.bubble.text, v.x, ty-fs*.8]); else v.bubble=null;
+  }
+  labels.sort((a,b)=>a[0]-b[0]).forEach(l=>tag(...l.slice(1)));
+  const placed=[]; talk.sort((a,b)=>a[0]-b[0]).slice(-6).forEach(b=>bubble(...b.slice(1), placed));
   // gift icons rising, petals / hearts
   for (let i=fx.length-1;i>=0;i--){ const f=fx[i]; f.t+=dt; const k=f.t/f.life; if(k>=1){ fx.splice(i,1); continue; } const pop=1-Math.pow(1-Math.min(1,f.t*4),3);
-    ctx.save(); ctx.globalAlpha=k<.75?1:(1-k)/.25; sprite(A[f.kind],f.x,f.y-k*170,f.scale*(.6+.4*pop)); ctx.restore(); }
+    ctx.save(); ctx.globalAlpha=k<.75?1:(1-k)/.25; sprite(A[f.kind],f.x,f.y-k*150,f.scale*(.6+.4*pop)); ctx.restore(); }
   for (let i=petals.length-1;i>=0;i--){ const p=petals[i]; p.t+=dt; if(p.t>p.life){ petals.splice(i,1); continue; } p.x+=p.vx*dt+Math.sin(p.t*3+i)*20*dt; p.y+=p.vy*dt;
     ctx.save(); ctx.globalAlpha=Math.min(1,p.life-p.t); ctx.translate(p.x,p.y);
-    if (p.heart){ ctx.fillStyle='#ff5a7a'; ctx.font='34px serif'; ctx.textAlign='center'; ctx.fillText('♥',0,0); } else { ctx.rotate(Math.sin(p.t*2+i)*.6); sprite(A.petal,0,0,p.s,.5); }
+    if (p.heart){ ctx.fillStyle='#ff5a7a'; ctx.font=`${p.size}px serif`; ctx.textAlign='center'; ctx.fillText('♥',0,0); } else { ctx.rotate(Math.sin(p.t*2+i)*.6); sprite(A.petal,0,0,p.s,.5); }
     ctx.restore(); }
 }
 /* lantern ambience: every few minutes the hall lanterns brighten for a moment */
@@ -325,7 +451,7 @@ c.save();c.setTransform(c.canvas.width/1080,0,0,c.canvas.height/1920,0,0);c.glob
 const w=c.measureText(s).width+60,x=540-w/2,y=322;c.fillStyle='rgba(40,16,6,.88)';c.beginPath();c.roundRect?c.roundRect(x,y,w,54,27):c.rect(x,y,w,54);c.fill();
 c.lineWidth=2;c.strokeStyle='rgba(226,176,79,.9)';c.stroke();c.fillStyle='#ffd98a';c.textAlign='center';c.textBaseline='middle';c.fillText(s,540,y+28);c.restore();}
 const _k='frame',_o=window[_k];window[_k]=function(t){_o(t);try{_g(t);}catch(e){}};})();
-layout(24); requestAnimationFrame(frame);
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>

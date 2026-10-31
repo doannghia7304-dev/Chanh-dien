@@ -73,17 +73,17 @@ button.red{background:var(--red);border-color:#b84a33}
     <input id="simText" value="Nam mô A Di Đà Phật, cầu gia đình bình an">
     <div class="row"><button id="btnChat">Gửi bình luận</button></div>
     <div class="row">
-      <button data-gift="Hoa hồng" data-dia="1">Hoa hồng · 1</button>
+      <button data-gift="Hoa hồng" data-dia="1">Dâng hương · 1</button>
+      <button data-gift="Nén hương" data-dia="5">Lễ Phật · 5</button>
       <button data-gift="Đèn hoa sen" data-dia="30">Hoa sen · 30</button>
-      <button data-gift="Chuông vàng" data-dia="199">Chuông · 199</button>
     </div>
-    <p class="hint">Gõ <b>nam · nữ · sư · ni · tiểu · bà · cao tăng</b> làm bình luận để đổi hình.</p>
+    <p class="hint">Gõ <b>nam · nữ · sư · ni · tiểu · bà · cao tăng</b> làm bình luận để đổi hình. Quà 1 xu tính là Dâng hương, 5 xu là Lễ Phật, từ 10 xu là Hoa sen.</p>
     <h2>Đổ người mẫu</h2>
-    <div class="row"><button data-fill="15">15</button><button data-fill="36">36</button><button data-fill="64">64</button><button data-fill="100">100</button></div>
+    <div class="row"><button data-fill="30">30</button><button data-fill="80">80</button><button data-fill="150">150</button><button data-fill="200">200</button></div>
     <button class="red" id="btnClear">Làm trống toàn bộ bồ đoàn</button>
     <h2>Bot tương tác mô phỏng</h2>
     <div class="row">
-      <label>Số bot<input id="botN" type="number" min="1" max="100" value="12"></label>
+      <label>Số bot<input id="botN" type="number" min="1" max="200" value="12"></label>
       <label>Nhịp<select id="botPace"><option value="slow">Chậm</option><option value="mid" selected>Vừa</option><option value="fast">Nhanh</option></select></label>
       <button id="btnBots">Bật bot</button>
     </div>
@@ -114,9 +114,12 @@ button.red{background:var(--red);border-color:#b84a33}
     <label>Tên thiền đường<input id="title" value="Chánh Điện Tịnh Tâm"></label>
     <label>Dòng phụ<input id="subtitle" value="Nam Mô A Di Đà Phật"></label>
     <div class="row">
-      <label>Số chỗ ngồi<select id="seatMode"><option value="auto">Tự mở rộng 24 → 100</option><option value="24">24</option><option value="36">36</option><option value="64">64</option><option value="100">100</option></select></label>
+      <label>Số chỗ ngồi<select id="seatMode"><option value="auto">200 (tối đa)</option><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="200">200</option></select></label>
+      <label>Khóa lễ (phút)<input id="sessionMin" type="number" min="5" max="240" value="60"></label>
     </div>
     <label class="check"><input type="checkbox" id="joinOnEnter"> Người vào phòng cũng được ngồi (không cần bình luận)</label>
+    <div class="row"><button id="btnSession">⏱ Bắt đầu lại khóa lễ</button><button id="btnResetStats">Xóa bảng lễ vật</button></div>
+    <p class="hint">Hết giờ khóa lễ thì tự thỉnh chuông, đọc kinh rồi đếm lại. "Xóa bảng lễ vật" đặt các bộ đếm và bảng Tấm Lòng Thành về 0.</p>
   </section>
 </div>
 
@@ -131,7 +134,7 @@ const $ = id => document.getElementById(id);
 let ws = null;
 const send = (cmd, extra={}) => ws?.readyState===1 && ws.send(JSON.stringify({ t:'ctl', cmd, ...extra }));
 function logLine(s){ const el=$('log'); el.textContent += s + '\n'; el.scrollTop = el.scrollHeight; }
-const SETTING_IDS = ['voice','pitch','rate','music','mo','autoChant','moBpm','chantEveryMin','title','subtitle','seatMode','joinOnEnter'];
+const SETTING_IDS = ['voice','pitch','rate','music','mo','autoChant','moBpm','chantEveryMin','title','subtitle','seatMode','sessionMin','joinOnEnter'];
 function fillSettings(s){ for (const k of SETTING_IDS){ const el=$(k); if (!el || s[k]===undefined) continue; if (el.type==='checkbox') el.checked=!!s[k]; else el.value=s[k]; } }
 function readSettings(){ const o={}; for (const k of SETTING_IDS){ const el=$(k); o[k] = el.type==='checkbox' ? el.checked : el.type==='number' ? +el.value : el.value; } return o; }
 const people = new Map();
@@ -177,6 +180,8 @@ $('btnSay').onclick = () => send('say', { text: $('sayText').value });
 $('btnChant').onclick = () => send('chant');
 $('btnBell').onclick = () => send('bell');
 $('btnMo').onclick = () => send('mo');
+$('btnSession').onclick = () => send('session');
+$('btnResetStats').onclick = () => { if (confirm('Xóa toàn bộ bộ đếm lễ vật và bảng Tấm Lòng Thành?')) send('resetStats'); };
 for (const k of SETTING_IDS) $(k).addEventListener('change', () => send('settings', { settings: readSettings() }));
 </script>
 </body>

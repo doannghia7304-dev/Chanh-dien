@@ -24,14 +24,16 @@ npm start
 3. Trong TikTok LIVE Studio: *Add source → Window capture* → chọn cửa sổ overlay. Với OBS thì dùng *Browser source* trỏ tới `http://localhost:3000/live/overlay.html`, kích thước 1080×1920.
 4. Bật LIVE trên TikTok, nhập `@username` vào bảng điều khiển, bấm **Kết nối**.
 
-Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người mẫu 15/36/64/100** hoặc **Bot mô phỏng**.
+Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người mẫu 30/80/150/200** hoặc **Bot mô phỏng**.
 
 ### Người xem làm được gì
 
-- **Bình luận bất kỳ**: được vào ngồi (tối đa 100 chỗ, chỗ ngồi tự mở rộng 24 → 36 → 64 → 100). Đầy chỗ thì người im lặng lâu nhất mà chưa tặng quà sẽ nhường chỗ.
+- **Bình luận bất kỳ**: đi dọc thảm đỏ vào quỳ (tối đa 200 chỗ), bình luận hiện thành bong bóng chữ trên đầu. Đầy chỗ thì người im lặng lâu nhất mà chưa tặng quà sẽ nhường chỗ.
 - **Bình luận đúng một từ** `nam`, `nữ`, `sư`, `ni`, `tiểu`, `bà`, `cao tăng`: đổi hình nhân vật. Câu "Nam mô A Di Đà Phật" không bị hiểu nhầm thành "nam".
 - **Tặng quà**: banner xướng tên, giọng đọc hồi hướng (lấy lời nguyện từ bình luận gần nhất của người đó nếu có), hiệu ứng theo giá trị quà, cộng điểm vào bảng Công Đức.
 - **Thả tim**: tim bay trên đầu nhân vật.
+
+Overlay có đồng hồ đếm ngược khóa lễ (mặc định 60 phút, hết giờ tự thỉnh chuông và đọc kinh), bộ đếm Dâng hương · Lễ Phật · Hoa sen · Thả tim, bảng giá lễ 1 / 5 / 10+ xu và bảng **Tấm Lòng Thành** top 3. Quà dưới 5 xu tính là Dâng hương, 5–9 xu là Lễ Phật, từ 10 xu là Hoa sen.
 
 ## Bảo mật
 
@@ -51,7 +53,7 @@ Các lớp trên đã được thử: đường dẫn `../`, `%2e%2e`, `.git/con
 
 - `tiktok-live-connector` là thư viện cộng đồng, không phải API chính thức của TikTok. Nó có thể ngừng chạy khi TikTok đổi hệ thống. Kiểm tra điều khoản TikTok trước khi dùng cho kênh của bạn.
 - Giọng đọc dùng dịch vụ Read Aloud của Microsoft Edge qua mạng (giọng Nam Minh, Hoài My). Máy phát cần có Internet.
-- Hình ảnh trong `assets/` được tạo bằng Google Flow, nhạc nền tạo bằng Gemini. Kiểm tra điều khoản của các dịch vụ đó trước khi dùng thương mại, hoặc thay bằng tài nguyên của bạn.
+- Hình ảnh trong `assets/` được tạo bằng Google Flow (riêng ảnh nền overlay `grand_hall.jpg` tạo bằng Figma AI), nhạc nền tạo bằng Gemini. Kiểm tra điều khoản của các dịch vụ đó trước khi dùng thương mại, hoặc thay bằng tài nguyên của bạn.
 
 ## Miễn trừ trách nhiệm
 
