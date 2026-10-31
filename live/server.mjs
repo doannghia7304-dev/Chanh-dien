@@ -60,7 +60,8 @@ setInterval(() => { if (Date.now() >= sessionEndsAt){ resetSession(); broadcast(
 // A comment changes the outfit only when it IS the keyword (≤ 3 words), so "Nam mô A Di Đà Phật" never reads as "nam".
 const SKIN_WORDS = [
   ['master', ['cao tăng','cao tang']], ['monk', ['sư','su','sư thầy','su thay','thầy','thay']], ['nun', ['ni','ni cô','ni co','sư cô','su co']],
-  ['child', ['tiểu','tieu','chú tiểu','chu tieu','bé','be']], ['granny', ['bà','ba','áo nâu','ao nau','cụ','cu']],
+  ['child', ['tiểu','tieu','chú tiểu','chu tieu','bé','be']], ['grandpa', ['ông','ong','ông cụ','ong cu','cụ ông','cu ong']],
+  ['granny', ['bà','ba','cụ bà','cu ba','cụ','cu']],
   ['woman', ['nữ','nu','chị','chi','gái','gai']], ['man', ['nam','anh','trai']],
 ];
 function skinFromText(t){
@@ -69,7 +70,7 @@ function skinFromText(t){
   for (const [skin, words] of SKIN_WORDS) if (words.some(k => w === k || w.startsWith(k + ' '))) return skin;
   return null;
 }
-const DEFAULT_SKINS = ['woman', 'man', 'woman', 'man', 'woman', 'man', 'granny'];
+const DEFAULT_SKINS = ['woman', 'man', 'woman', 'man', 'granny', 'grandpa'];
 
 function pub(v){ return { id:v.id, name:v.name, skin:v.skin, avatar:v.avatar||'', coins:v.coins, demo:!!v.demo }; }
 function snapshot(){ return { t:'state', settings, viewers:[...viewers.values()].map(pub), cap: capacity(), startedAt, tiktok: tiktokState,
@@ -204,7 +205,7 @@ function fillDemo(n){
   const have = [...viewers.values()].filter(v => v.demo).length;
   for (let i = have; i < n && viewers.size < capacity(); i++){
     const name = DEMO_NAMES[i % DEMO_NAMES.length] + (i >= DEMO_NAMES.length ? ' ' + (Math.floor(i / DEMO_NAMES.length) + 1) : '');
-    seat('demo_' + i, name, { demo: true, skin: ['woman','man','woman','man','woman','monk','man','woman','granny','man','nun','child'][i % 12] });   // mostly áo tràng lam, like a real hall
+    seat('demo_' + i, name, { demo: true, skin: DEFAULT_SKINS[i % DEFAULT_SKINS.length] });
   }
 }
 function clearSeats(){ viewers.clear(); broadcast(snapshot()); addLog('Đã làm trống bồ đoàn'); }

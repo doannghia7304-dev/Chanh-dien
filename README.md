@@ -29,7 +29,7 @@ Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người 
 ### Người xem làm được gì
 
 - **Bình luận bất kỳ**: đi dọc thảm đỏ vào quỳ (tối đa 200 chỗ), bình luận hiện thành bong bóng chữ trên đầu. Đầy chỗ thì người im lặng lâu nhất mà chưa tặng quà sẽ nhường chỗ.
-- **Bình luận đúng một từ** `nam`, `nữ`, `sư`, `ni`, `tiểu`, `bà`, `cao tăng`: đổi hình nhân vật. Câu "Nam mô A Di Đà Phật" không bị hiểu nhầm thành "nam".
+- **Bình luận đúng một từ** `nam`, `nữ`, `ông`, `bà`, `sư`, `ni`, `tiểu`, `cao tăng`: đổi hình nhân vật. Câu "Nam mô A Di Đà Phật" không bị hiểu nhầm thành "nam".
 - **Tặng quà**: banner xướng tên, giọng đọc hồi hướng (lấy lời nguyện từ bình luận gần nhất của người đó nếu có), hiệu ứng theo giá trị quà, cộng điểm vào bảng Công Đức.
 - **Thả tim**: tim bay trên đầu nhân vật.
 

@@ -116,18 +116,23 @@ const $ = id => document.getElementById(id);
 
 /* ======================= assets ======================= */
 const A = {};
-const IMG = { hall:'/assets/grand_hall.jpg', abbot:'/assets/abbot.png', lotus:'/assets/fx_lotus.png', halo:'/assets/fx_halo.png', bell:'/assets/fx_bell.png', incense:'/assets/fx_incense.png', petal:'/assets/fx_petal.png' };
+const IMG = { hall:'/assets/grand_hall.jpg', abbot:'/assets/abbot.png',
+  k_man:'/assets/k_man.png', k_woman:'/assets/k_woman.png', k_grandpa:'/assets/k_grandpa.png', k_granny:'/assets/k_granny.png', lotus:'/assets/fx_lotus.png', halo:'/assets/fx_halo.png', bell:'/assets/fx_bell.png', incense:'/assets/fx_incense.png', petal:'/assets/fx_petal.png' };
 for (const [k,src] of Object.entries(IMG)){ const im=new Image(); im.src=src; A[k]=im; }
 const FX_ICON = { incense:'incense', bow:'halo', lotus:'lotus' };
 const avatars = new Map();
 function avatar(url){ if(!url) return null; let im=avatars.get(url); if(!im){ im=new Image(); im.referrerPolicy='no-referrer'; im.src=url; avatars.set(url,im); } return im.naturalWidth?im:null; }
 
 /* ======================= worshipper sprites ======================= */
-// Small figures seen from behind, facing the Buddha. Painted once per outfit into offscreen canvases, then scaled per seat.
+// Small figures seen from behind, facing the Buddha. Lay people kneel as painted sprites (KNEEL_IMG); everyone else, and
+// everyone while walking, is painted once per outfit into offscreen canvases, then scaled per seat.
+const KNEEL_IMG = { man:'k_man', woman:'k_woman', grandpa:'k_grandpa', granny:'k_granny' };
+const KNEEL_H = 92;                                   // px height of a kneeling sprite at depth 1
 const SKINS = {
-  man:    { robe:'#a7a3c4', dark:'#67628a', hair:'#2a211c' },
-  woman:  { robe:'#9ea8cc', dark:'#5f6995', hair:'#1d1612', bun:true },
-  granny: { robe:'#80563a', dark:'#4c301d', hair:'#bdb6ad', bun:true },
+  man:    { robe:'#b9c2e2', dark:'#7c87ad', hair:'#2b211d' },
+  woman:  { robe:'#d8c6e8', dark:'#9a85b2', hair:'#2b211d', bun:true },
+  grandpa:{ robe:'#77442a', dark:'#4a2817', hair:'#d8dae2' },
+  granny: { robe:'#a87cba', dark:'#6e4b80', hair:'#c8cad2', bun:true },
   monk:   { robe:'#c99a3c', dark:'#85601e' },
   nun:    { robe:'#9d9c99', dark:'#61605d' },
   child:  { robe:'#b8b2d2', dark:'#767096', small:true },
@@ -216,7 +221,7 @@ function addVisitor(p, instant){
   visitors.set(p.id, v);
   if (instant || !seat || walking > 10){ v.state='sit'; v.x=seat?.x ?? 540; v.y=seat?.y ?? 1500; v.fade=instant?1:0; }
 }
-function removeVisitor(id){ const v=visitors.get(id); if (v?.seat) taken[v.seat.idx]=null; visitors.delete(id); }
+function removeVisitor(id){ const v=visitors.get(id); if (!v) return; endOffering(v); if (v.seat) taken[v.seat.idx]=null; visitors.delete(id); }
 
 /* the abbot (painted sprite, larger than life so he reads on a phone) kneels at the head of the carpet, two teachers just behind him */
 const TEACHERS = [ { name:'Thầy Minh Đạo', skin:'monk', x:458, y:858 }, { name:'Thầy Tâm Từ', skin:'monk', x:622, y:858 } ];
@@ -226,6 +231,7 @@ const ABBOT = { name:'Sư Trụ Trì', x:540, y:888, w:112 };
 const PRESTIGE = SEATS.map((s,i)=>i).sort((a,b) => SEATS[a].r-SEATS[b].r || SEATS[a].i-SEATS[b].i || SEATS[a].x-SEATS[b].x);
 function moveTo(v, si, instant){
   v.seat = SEATS[si]; taken[si] = v.id;
+  if (v.offer) return;                                                    // still offering: goes to the new seat afterwards
   if (instant){ v.state='sit'; v.x=v.seat.x; v.y=v.seat.y; return; }
   if (v.state==='sit'){ v.state='walk'; v.lane=Math.random()-.5; }      // stands up: out to the carpet, along it, then into the row
 }
@@ -319,15 +325,34 @@ function playTTS(){
 /* ======================= effects ======================= */
 const fx=[], petals=[];
 let rays=0, beam=0;          // Buddha's halo rays and the light column down to the incense burner, both fade out
-function giftFx(v, tier, kind){
+function blessing(tier){     // an offering reaches the Buddha: halo rays, light column and petals by its size
   rays = Math.max(rays, tier>=3 ? 1 : tier>=2 ? .75 : .4); if (tier>=2) beam = 1;
-  if (!v) return;
-  v.glow=1; v.bow=1; v.active=performance.now();
-  const k=v.seat?.k || .8;
-  fx.push({ kind: tier>=3 ? 'bell' : FX_ICON[kind] || 'incense', x:v.x, y:v.y-110*UNIT*k, t:0, life: tier>=3?3.4:2.4, scale: k*(tier>=3?.75:.55) });
-  for (let i=0;i<(tier>=3?22:tier>=2?10:4);i++) petals.push({x:v.x+(Math.random()-.5)*100*k, y:v.y-60*k, vx:(Math.random()-.5)*40, vy:-(70+Math.random()*90), t:0, life:2.6+Math.random(), s:.1+Math.random()*.1});
-  if (tier>=3){ bell(true); for (let i=0;i<30;i++) petals.push({x:540+(Math.random()-.5)*700, y:120+Math.random()*250, vx:(Math.random()-.5)*40, vy:30+Math.random()*50, t:0, life:5, s:.16+Math.random()*.12}); }
+  if (tier>=2) bell(tier>=3);
+  for (let i=0;i<(tier>=3?30:tier>=2?14:6);i++) petals.push({x:540+(Math.random()-.5)*(tier>=3?700:320), y:120+Math.random()*250, vx:(Math.random()-.5)*40, vy:30+Math.random()*50, t:0, life:4+Math.random(), s:.14+Math.random()*.12});
 }
+function giftFx(v, tier, kind){
+  if (v){ v.glow=1; v.active=performance.now(); }
+  if (startOffering(v, tier, kind)) return;                 // blessing follows when the offering arrives
+  blessing(tier);                                            // no free spot before the altar: bless in place
+  if (!v) return;
+  v.bow=1; const k=v.seat?.k || .8;
+  fx.push({ kind: FX_ICON[kind] || 'incense', x:v.x, y:v.y-110*UNIT*k, t:0, life: tier>=3?3.4:2.4, scale: k*(tier>=3?.75:.55) });
+}
+
+/* offering procession: the giver walks up the carpet, kneels before the abbot, bows three times while the offering
+   floats up to the Buddha, then goes on to their (donor) seat */
+const OFFER_SPOTS = [ {x:540,y:955}, {x:488,y:962}, {x:592,y:962}, {x:540,y:1004}, {x:482,y:1012}, {x:598,y:1012} ];
+const spotBusy = new Array(OFFER_SPOTS.length).fill(null);
+function startOffering(v, tier, kind){
+  if (!v?.seat) return false;
+  if (v.offer){ v.offer.tier=Math.max(v.offer.tier,tier); v.offer.kind=kind; if (v.state==='offer'){ v.offer.t=Math.min(v.offer.t,.3); v.offer.flown=false; } return true; }   // a combo: bow and offer again
+  const si=spotBusy.indexOf(null); if (si<0) return false;
+  spotBusy[si]=v.id; v.offer={ spot:si, tier, kind, t:0, flown:false }; v.dest=OFFER_SPOTS[si];
+  if (v.state==='sit') v.state='walk';
+  v.lane=Math.max(-.9, Math.min(.9, (v.dest.x-540)/(carpetHalf(v.dest.y)*.6) + (si>=3 ? .25 : 0)));   // each spot has its own lane up the carpet
+  return true;
+}
+function endOffering(v){ if (!v.offer) return; spotBusy[v.offer.spot]=null; v.offer=null; v.dest=null; }
 function hearts(v,n){ if (!v) return; const k=v.seat?.k || .8; for (let i=0;i<Math.min(6,n);i++) petals.push({x:v.x+(Math.random()-.5)*50*k, y:v.y-100*UNIT*k, vx:(Math.random()-.5)*20, vy:-(50+Math.random()*40), t:0, life:1.6, s:.08, heart:true, size:Math.max(18,34*k)}); }
 
 /* ======================= server link ======================= */
@@ -342,7 +367,7 @@ function connect(){
     switch(m.t){
       case 'state':
         Object.assign(settings,m.settings); applySettings(); if (m.sessionEndsAt) sessionEndsAt=m.sessionEndsAt;
-        visitors.clear(); taken.fill(null); for (const p of m.viewers) addVisitor(p,true); arrange(true);
+        visitors.clear(); taken.fill(null); spotBusy.fill(null); for (const p of m.viewers) addVisitor(p,true); arrange(true);
         updateCount(); setStats(m.stats); setTop(m.top); setTicker(m.lastOffer); break;
       case 'settings': Object.assign(settings,m.settings); applySettings(); break;
       case 'join': addVisitor(m.v, m.v.demo && visitors.size>8); if (m.v.coins>0) arrange(); updateCount(); break;
@@ -368,7 +393,7 @@ function applySettings(){
 connect();
 
 /* ======================= render ======================= */
-const ctx=$('c').getContext('2d');
+const ctx=$('c').getContext('2d'); ctx.imageSmoothingQuality='high';   // painted sprites are scaled down a lot
 function sprite(im,x,y,s,ay=1){ if(!im?.naturalWidth) return; const w=im.naturalWidth*s,h=im.naturalHeight*s; ctx.drawImage(im,x-w/2,y-h*ay,w,h); }
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function tag(text,x,y,fs,gold,av){
@@ -396,8 +421,28 @@ function bubble(text,x,y,placed){
   ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
   lines.forEach((l,i)=>ctx.fillText(l, bx+w/2, by+fs*.3+lh*(i+.5)+1));
 }
-function figure(skin, x, y, k, state, step, extra){
-  const sp = SPR[skin] || SPR.man, sc = UNIT*k*(SKINS[skin]?.small ? .8 : 1);
+// Standing pose built from the kneeling sprite: same head, back and sleeves, the robe let down to the ankles,
+// its hem swinging and the heels showing in turn as the person walks. CUT/HEM: where the sleeves and the robe end
+// (above the soles), as fractions of the sprite height.
+const CUT=.64, HEM=.875;
+function walkFromKneel(im, x, y, k, wp, extra){
+  const iw=im.naturalWidth, ih=im.naturalHeight, s=KNEEL_H*k/ih, w=iw*s;
+  const upH=ih*CUT*s, loSrc=ih*(HEM-CUT), loH=loSrc*s*2.3, ftSrc=ih*(1-HEM), ftH=ftSrc*s*.75;
+  const sw=Math.sin(wp), bob=Math.abs(Math.cos(wp))*KNEEL_H*k*.025;
+  const hemY=y-ftH*.55, top=hemY-loH-upH-bob-extra;
+  for (const side of [-1,1]){ const lift=Math.max(0,side*sw)*ftH*.7;                 // heels, the stepping foot lifted
+    ctx.drawImage(im, side<0?iw*.3:iw*.5, ih*HEM, iw*.2, ftSrc, side<0?x-w*.2:x, hemY-ftH*.35-lift, w*.2, ftH); }
+  ctx.save(); ctx.translate(x, top+upH); ctx.transform(1,0,sw*.05,1,0,0);
+  ctx.drawImage(im, 0, ih*CUT, iw, loSrc, -w*.42, -3*s, w*.84, loH+3*s); ctx.restore();
+  ctx.drawImage(im, 0, 0, iw, ih*CUT, x-w/2, top, w, upH);
+  return y-top;
+}
+function figure(skin, x, y, k, state, step, extra, wp){
+  const sp = SPR[skin] || SPR.man, sc = UNIT*k*(SKINS[skin]?.small ? .8 : 1), im = A[KNEEL_IMG[skin]];
+  if (im?.naturalWidth){
+    if (state==='walk') return walkFromKneel(im, x, y, k, wp||0, extra);
+    const h=KNEEL_H*k, w=h*im.naturalWidth/im.naturalHeight; ctx.drawImage(im, x-w/2, y-h-extra, w, h); return h;
+  }
   if (state==='walk'){ const im=sp.walk[step]; ctx.drawImage(im, x-45*sc, y-154*sc-extra, 90*sc, 160*sc); return 140*sc; }
   ctx.drawImage(sp.kneel, x-55*sc, y-104*sc-extra, 110*sc, 110*sc); return 96*sc;
 }
@@ -436,22 +481,27 @@ function frame(now){
   // worshippers back to front; tags and bubbles are drawn after everyone so nobody hides them
   const list=[...visitors.values()].filter(v=>v.seat).sort((a,b)=>a.y-b.y), showAll=visitors.size<=40, labels=[], talk=[];
   for (const v of list){
-    const s=v.seat;
+    const s=v.dest || v.seat;                                // heading for the altar while offering, else the seat
     if (v.state==='walk'){
       const sp=240*depth(v.y)*dt, dy=s.y-v.y, lane=540+v.lane*carpetHalf(v.y)*.6;
       if (Math.abs(dy)>2 && Math.abs(lane-v.x)>8) v.x+=Math.sign(lane-v.x)*Math.min(Math.abs(lane-v.x), sp*1.1);    // out of the row onto the carpet
       else if (Math.abs(dy)>2){ v.y+=Math.sign(dy)*Math.min(Math.abs(dy), sp); v.x=540+v.lane*carpetHalf(v.y)*.6; }  // along the carpet
-      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state='sit'; v.sitT=0; } }   // then into the row
-      v.ft+=dt; if (v.ft>.2){ v.ft=0; v.step^=1; }
+      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state=v.dest?'offer':'sit'; v.sitT=0; if (v.offer) v.offer.t=0; } }   // then into place
+      v.ft+=dt; if (v.ft>.2){ v.ft=0; v.step^=1; } v.wp=(v.wp||0)+dt*9;
+    } else if (v.state==='offer'){
+      const o=v.offer; o.t+=dt; v.sitT=Math.min(1,v.sitT+dt*2.5);
+      if (!o.flown && o.t>.6){ o.flown=true; fx.push({ fly:true, kind:FX_ICON[o.kind]||'incense', x0:v.x, y0:v.y-KNEEL_H*depth(v.y), x1:540, y1:300, t:0, life:1.8, scale:o.tier>=3?.42:.32, tier:o.tier }); }
+      if (o.t>3.8){ endOffering(v); v.state='walk'; v.lane=Math.random()-.5; }
     } else v.sitT=Math.min(1,v.sitT+dt*2.5);
     v.fade=Math.min(1,v.fade+dt*2); v.glow=Math.max(0,v.glow-dt*.45); v.bow=Math.max(0,v.bow-dt*.7);
     const k=depth(v.y);
     if (v.glow>0 || v.skin==='master') glow(v.x, v.y-45*k, 75*k, Math.max(v.glow*.4, v.skin==='master'?.22+.06*Math.sin(t*1.6):0));   // the floor is bright already: keep it soft
     ctx.save(); ctx.globalAlpha=v.fade;
-    const bowK = v.state==='sit' ? Math.sin(Math.min(1,v.bow)*Math.PI)*.07 : 0;
+    const bowK = v.state==='sit' ? Math.sin(Math.min(1,v.bow)*Math.PI)*.07
+               : v.state==='offer' && v.offer.t<3.3 ? .16*Math.max(0,Math.sin(Math.PI*(v.offer.t%1.1)/1.1)) : 0;   // three deep bows before the altar
     if (bowK){ ctx.translate(v.x,v.y); ctx.scale(1,1-bowK); ctx.translate(-v.x,-v.y); }
-    const lift = v.state==='walk' ? Math.abs(Math.sin(t*10+v.phase))*2.5*k : (1-v.sitT)*8*k + Math.sin(t*1.1+v.phase)*.8*k;
-    const top = figure(v.skin, v.x, v.y, k, v.state, v.step, lift);
+    const lift = v.state==='walk' ? (KNEEL_IMG[v.skin] ? 0 : Math.abs(Math.sin(t*10+v.phase))*2.5*k) : (1-v.sitT)*8*k + Math.sin(t*1.1+v.phase)*.8*k;
+    const top = figure(v.skin, v.x, v.y, k, v.state, v.step, lift, v.wp);
     ctx.restore();
     const fs=Math.max(13,Math.round(19*k)), ty=v.y-top-fs*.9 - (v.rank<10 && v.state==='sit' && (v.rank>>1)&1 ? fs*1.5 : 0);   // neighbouring donors' names step up and down
     if (showAll || now-v.active<25000 || v.rank<10) labels.push([v.rank<10 ? now+1e6-v.rank : v.active, v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);   // top-10 donors always named, drawn on top
@@ -459,8 +509,11 @@ function frame(now){
   }
   labels.sort((a,b)=>a[0]-b[0]).forEach(l=>tag(...l.slice(1)));
   const placed=[]; talk.sort((a,b)=>a[0]-b[0]).slice(-6).forEach(b=>bubble(...b.slice(1), placed));
-  // gift icons rising, petals / hearts
-  for (let i=fx.length-1;i>=0;i--){ const f=fx[i]; f.t+=dt; const k=f.t/f.life; if(k>=1){ fx.splice(i,1); continue; } const pop=1-Math.pow(1-Math.min(1,f.t*4),3);
+  // offerings flying to the Buddha, gift icons rising, petals / hearts
+  for (let i=fx.length-1;i>=0;i--){ const f=fx[i]; f.t+=dt; const k=f.t/f.life; if(k>=1){ fx.splice(i,1); if (f.fly) blessing(f.tier); continue; }
+    if (f.fly){ const e=k<.5?2*k*k:1-Math.pow(2-2*k,2)/2, x=f.x0+(f.x1-f.x0)*e, y=f.y0+(f.y1-f.y0)*e-Math.sin(Math.PI*k)*140;
+      glow(x,y,70,.55); ctx.save(); ctx.globalAlpha=k<.85?1:(1-k)/.15; sprite(A[f.kind],x,y,f.scale*(.7+.5*k),.5); ctx.restore(); continue; }
+    const pop=1-Math.pow(1-Math.min(1,f.t*4),3);
     ctx.save(); ctx.globalAlpha=k<.75?1:(1-k)/.25; sprite(A[f.kind],f.x,f.y-k*150,f.scale*(.6+.4*pop)); ctx.restore(); }
   for (let i=petals.length-1;i>=0;i--){ const p=petals[i]; p.t+=dt; if(p.t>p.life){ petals.splice(i,1); continue; } p.x+=p.vx*dt+Math.sin(p.t*3+i)*20*dt; p.y+=p.vy*dt;
     ctx.save(); ctx.globalAlpha=Math.min(1,p.life-p.t); ctx.translate(p.x,p.y);
