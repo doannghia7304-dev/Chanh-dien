@@ -71,6 +71,10 @@ function skinFromText(t){
   return null;
 }
 const DEFAULT_SKINS = ['woman', 'man', 'woman', 'man', 'granny', 'grandpa'];
+// The look comes from a hash of the viewer id, not the arrival order: seats fill left/right in turn, so cycling
+// through the list would put every woman on one side of the carpet and every man on the other.
+const hashId = s => { let h = 2166136261; for (const c of String(s)) h = Math.imul(h ^ c.codePointAt(0), 16777619); return h >>> 0; };
+const defaultSkin = id => DEFAULT_SKINS[hashId(id) % DEFAULT_SKINS.length];
 
 function pub(v){ return { id:v.id, name:v.name, skin:v.skin, avatar:v.avatar||'', coins:v.coins, demo:!!v.demo }; }
 function snapshot(){ return { t:'state', settings, viewers:[...viewers.values()].map(pub), cap: capacity(), startedAt, tiktok: tiktokState,
@@ -84,7 +88,7 @@ function seat(id, name, opts = {}){
     if (!quiet) return { v:null, isNew:false };
     viewers.delete(quiet.id); broadcast({ t:'leave', id: quiet.id });
   }
-  v = { id, name: (name||id).slice(0, 18), skin: opts.skin || DEFAULT_SKINS[viewers.size % DEFAULT_SKINS.length],
+  v = { id, name: (name||id).slice(0, 18), skin: opts.skin || defaultSkin(id),
         avatar: opts.avatar || '', coins: 0, joinedAt: Date.now(), lastAt: Date.now(), demo: !!opts.demo };
   viewers.set(id, v);
   broadcast({ t:'join', v: pub(v), cap: capacity() });
@@ -210,7 +214,7 @@ function fillDemo(n){
   for (let i = 0; have < n && viewers.size < capacity(); i++){
     if (viewers.has('demo_' + i)) continue;
     const name = DEMO_NAMES[i % DEMO_NAMES.length] + (i >= DEMO_NAMES.length ? ' ' + (Math.floor(i / DEMO_NAMES.length) + 1) : '');
-    seat('demo_' + i, name, { demo: true, skin: DEFAULT_SKINS[i % DEFAULT_SKINS.length] }); have++;
+    seat('demo_' + i, name, { demo: true, skin: defaultSkin('demo_' + i) }); have++;
   }
   return have;
 }
