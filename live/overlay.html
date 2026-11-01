@@ -14,6 +14,7 @@
   color-scheme:dark;
 }
 html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--body);color:var(--fg)}
+[hidden]{display:none!important}
 #fit{position:fixed;inset:0;overflow:hidden}
 /* when the stage is shrunk (frame size < 100%) the margin shows the hall again, blurred and dimmed; it never moves */
 #backdrop{position:absolute;inset:-60px;background:#000 url(/assets/grand_hall.jpg) center/cover;filter:blur(22px) brightness(.45)}
@@ -63,6 +64,26 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 #invite b{font:700 29px var(--body);color:var(--gold2);white-space:nowrap}
 #invite span{font-size:23px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .5s}
 #invite span.out{opacity:0}
+/* counters the room builds by commenting: the niệm Phật round toward 108, the candles lit this session */
+#acts{max-width:100%;box-sizing:border-box;padding:10px 20px 12px 16px;display:grid;gap:6px;background:rgba(28,13,7,.62);box-shadow:none}
+#acts div{display:flex;align-items:center;gap:10px;font-size:25px;white-space:nowrap}
+#acts b{color:var(--gold2);font-variant-numeric:tabular-nums}
+#acts #reciteBar{display:block;height:9px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+#reciteBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#e2b04f,#ffd98a);transition:width .4s}
+/* quiz over the middle rows: question, three answers and a countdown; at the end the right answer lights up */
+#quiz{left:90px;right:90px;top:1150px;padding:18px 28px 16px;border-radius:24px;border:2px solid var(--gold2);background:rgba(30,12,6,.93);
+  opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s}
+#quiz.show{opacity:1;transform:none}
+#quiz h4{margin:0 0 6px;text-align:center;font:700 26px var(--display);letter-spacing:.1em;color:var(--gold2)}
+#quizQ{font:600 33px/1.3 var(--body);text-align:center;margin-bottom:12px}
+#quizOpts{display:grid;gap:8px}
+#quizOpts div{display:flex;gap:14px;align-items:center;padding:7px 16px;border-radius:14px;background:rgba(255,255,255,.07);font-size:30px;transition:background .4s,opacity .4s}
+#quizOpts b{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff4dc;flex:none}
+#quizOpts div.right{background:rgba(70,140,50,.6);box-shadow:0 0 18px rgba(140,220,110,.5)}
+#quizOpts div.wrong{opacity:.4}
+#quizBar{height:8px;margin-top:10px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+#quizBar i{display:block;height:100%;width:100%;background:var(--gold2)}
+#quizFoot{margin-top:8px;text-align:center;font-size:24px;line-height:1.35;color:var(--muted)}
 /* pointer to TikTok's own gift button (bottom right on a phone): the stream can't be tapped, so it only shows the way.
    Up for a few seconds after each periodic chant, gone as soon as a gift banner needs the space. */
 #giftHint{right:24px;bottom:290px;display:flex;align-items:center;gap:10px;padding:8px 22px 8px 18px;border-radius:999px;
@@ -130,8 +151,10 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
   <div id="side" class="ui">
     <div id="invite" class="panel"><b>💬 Bình luận để vào chánh điện</b><span id="inviteTip">Bạn sẽ ngồi ngay trên bồ đoàn</span></div>
     <div id="ticker"><b id="tkName">Nam Mô A Di Đà Phật</b><i id="tkWhat">tùy hỷ công đức</i></div>
+    <div id="acts" class="panel"><div id="reciteRow">📿 Cùng niệm Phật <b id="reciteN">0/108</b></div><div id="reciteBar"><i></i></div><div id="candleRow">🕯️ <b id="candleN">0</b> ngọn nến cầu an</div></div>
   </div>
   <div id="chant" class="ui"><h4 id="chantHead">✦ TỤNG KINH ĐỊNH KỲ ✦</h4><p id="chantText"></p></div>
+  <div id="quiz" class="ui"><h4>✦ ĐỐ VUI PHẬT PHÁP ✦</h4><div id="quizQ"></div><div id="quizOpts"></div><div id="quizBar"><i></i></div><div id="quizFoot"></div></div>
   <div id="giftHint" class="ui"><span class="ic">🎁</span>Quà<span class="arrow">↘</span></div>
   <div id="gift" class="ui"><div class="who" id="giftWho"></div><div class="what" id="giftWhat"></div><div class="pray" id="giftPray"></div></div>
   <button id="unmute">🔔 Bấm để bật âm thanh</button>
@@ -250,7 +273,7 @@ const taken = new Array(SEATS.length).fill(null);
 const visitors = new Map();  // id -> visitor
 function addVisitor(p, instant){
   const old = visitors.get(p.id);
-  if (old){ Object.assign(old, { name:p.name, skin:p.skin, avatar:p.avatar, coins:p.coins }); return; }
+  if (old){ Object.assign(old, { name:p.name, skin:p.skin, avatar:p.avatar, coins:p.coins, badge:p.badge }); return; }
   const si = taken.indexOf(null), seat = si >= 0 ? SEATS[si] : null;
   if (seat) taken[si] = p.id;
   const walking = [...visitors.values()].filter(v => v.state==='walk' && !v.visit).length;
@@ -313,7 +336,11 @@ setInterval(() => {
 const inviteTips = () => [settings.greet ? 'Được ngồi bồ đoàn và xướng tên chào đón' : 'Bạn sẽ ngồi ngay trên bồ đoàn',
   ...(settings.teach !== false ? ['Gõ “lời dạy” để nhận một lời Phật dạy'] : []),
   settings.likeStep && likeGoal ? `Đủ ${fmt(likeGoal)} tim: mưa hoa sen khắp chánh điện` : 'Thả tim để tim bay trên đầu bạn',
+  ...(settings.recite !== false ? ['Gõ “Nam mô” để cùng niệm đủ 108 biến'] : []),
+  ...(settings.candles !== false ? ['Gõ “thắp nến” để thắp nến cầu an có tên mình'] : []),
+  ...(settings.quizEveryMin !== 0 ? ['Đố vui Phật pháp: bình luận A, B hoặc C'] : []),
   ...(settings.dedicate !== false ? ['Cuối khóa lễ hồi hướng, đọc tên người có mặt'] : []),
+  ...(settings.badges !== false ? ['Ngồi lâu nhận huy hiệu 🪷 Tinh tấn'] : []),
   'Gõ nam · nữ · ông · bà · sư · ni để đổi hình'];
 let inviteIdx = 0;
 setInterval(() => {
@@ -335,6 +362,31 @@ function showGift(m){
 let chantHide=null;
 // the same banner carries the periodic chant, a teaching asked for in a comment, the dedication and a likes goal
 function showChant(text, head='✦ TỤNG KINH ĐỊNH KỲ ✦', ms=14000){ $('chantHead').textContent=head; $('chantText').textContent=text; const el=$('chant'); el.classList.add('show'); clearTimeout(chantHide); chantHide=setTimeout(()=>el.classList.remove('show'), ms); }
+// niệm Phật round and candles: the card in the left column; a row hides when its programme is off
+let reciteN=0, candleList=[], candleFlare=0;
+function setActs(){
+  const r=settings.recite!==false, c=settings.candles!==false;
+  $('acts').hidden=!r && !c; $('reciteRow').hidden=$('reciteBar').hidden=!r; $('candleRow').hidden=!c;
+  $('reciteN').textContent=`${reciteN}/108`; $('reciteBar').firstElementChild.style.width=(reciteN/108*100)+'%';
+  $('candleN').textContent=candleList.length;
+}
+// quiz card: the countdown bar runs down to the end the server set; a missed end message still clears the card
+let quizHide=null;
+function showQuiz(m){
+  $('quizQ').textContent=m.q; const box=$('quizOpts'); box.textContent='';
+  m.options.forEach((o,i)=>{ const row=document.createElement('div'), b=document.createElement('b'), s=document.createElement('span'); b.textContent='ABC'[i]; s.textContent=o; row.append(b,s); box.append(row); });
+  $('quizFoot').textContent='Bình luận A, B hoặc C để trả lời';
+  const bar=$('quizBar').firstElementChild, ms=Math.max(0, m.endsAt-Date.now());
+  bar.style.transition='none'; bar.style.width='100%'; void bar.offsetWidth; bar.style.transition=`width ${ms}ms linear`; bar.style.width='0%';
+  $('quiz').classList.add('show'); clearTimeout(quizHide); quizHide=setTimeout(()=>$('quiz').classList.remove('show'), ms+15000);
+}
+function endQuizUi(m){
+  [...$('quizOpts').children].forEach((row,i)=>row.classList.add(i===m.right ? 'right' : 'wrong'));
+  const more=m.nRight-m.winners.length;
+  const who=m.winners.length ? `Đúng: ${m.winners.join(', ')}${more>0 ? ` và ${more} người khác` : ''}` : m.nAll ? 'Chưa ai trả lời đúng' : 'Chưa có ai trả lời';
+  $('quizFoot').textContent = who + (m.top?.length ? ` · Bảng Trí Tuệ: ${m.top.map(s=>`${s.name} ${s.score}`).join(' · ')}` : '');
+  clearTimeout(quizHide); quizHide=setTimeout(()=>$('quiz').classList.remove('show'), 10000);
+}
 let likeGoal=0, likesNow=0;
 function setGoal(likes, goal){
   if (goal!==undefined) likeGoal=goal; if (likes!==undefined) likesNow=likes; likes=likesNow; const step=settings.likeStep||0, el=$('goal');
@@ -485,6 +537,9 @@ function stepProcession(dt){
     m.wp+=dt*7; m.ft+=dt; if (m.ft>.25){ m.ft=0; m.step^=1; }
   }
 }
+// candle places: three staggered rows at the foot of the platform (room for the 80 the server allows), filled from
+// beside the carpet outwards, left and right in turn
+const CANDLE_SLOTS = []; [804, 820, 836].forEach((y,r) => { for (let i=0; i<17; i++) for (const side of [-1,1]) CANDLE_SLOTS.push({ x:540+side*(100+i*16+(r%2)*8), y }); });
 // the whole hall bows together, row after row from the front, at a chant and at the dedication that ends a session
 function bowWave(){ const now=performance.now(); for (const v of visitors.values()) if (v.seat) v.bowAt=now+v.seat.r*110+Math.random()*150; }
 // a likes goal reached: lotus petals rain over the whole hall, the halo flares and the big bell rings
@@ -536,7 +591,8 @@ function connect(){
       case 'state':
         Object.assign(settings,m.settings); applySettings(); if (m.sessionEndsAt) sessionEndsAt=m.sessionEndsAt;
         visitors.clear(); taken.fill(null); spotBusy.fill(null); visitBusy.fill(null); sideBusy.fill(null); for (const p of m.viewers) addVisitor(p,true); arrange(true);
-        updateCount(); setStats(m.stats); setGoal(m.stats?.likes, m.likeGoal); setTop(m.top); setTicker(m.lastOffer); break;
+        updateCount(); setStats(m.stats); setGoal(m.stats?.likes, m.likeGoal); setTop(m.top); setTicker(m.lastOffer);
+        reciteN=m.recite?.n||0; candleList=m.candles||[]; setActs(); break;
       case 'settings': Object.assign(settings,m.settings); applySettings(); break;
       case 'join': addVisitor(m.v, m.v.demo && visitors.size>8); if (m.v.coins>0) arrange(); updateCount(); break;
       case 'leave': { const was=visitors.get(m.id)?.coins>0; removeVisitor(m.id); if (was) arrange(); updateCount(); } break;
@@ -553,7 +609,21 @@ function connect(){
       case 'procession': startProcession(); break;
       case 'likegoal': lotusRain(); setGoal(undefined, m.next); showChant('Cảm ơn đại chúng đã thả tim. Nguyện hoa sen nở khắp mười phương, ai nấy thân tâm an lạc.', `✦ ĐỦ ${fmt(m.goal)} TIM · MƯA HOA SEN ✦`, 9000); break;
       case 'teach': { const v=visitors.get(m.id); if (v){ v.glow=1; v.bow=1; v.active=now; } showChant(m.text, `✦ LỜI PHẬT DẠY · ${m.name} ✦`, 12000); } break;
-      case 'dedicate': showChant(m.names.join(', ') + (m.more ? ` cùng ${m.more} Phật tử khác` : ''), '✦ HỒI HƯỚNG CÔNG ĐỨC ✦', 16000); bowWave();
+      case 'recite': { const v=visitors.get(m.id);
+        if (v){ v.bow=1; if (v.state==='sit') fx.push({ kind:'lotus', x:v.x, y:v.y-KNEEL_H*depth(v.y)*PEOPLE_K, t:0, life:1.6, scale:.16*depth(v.y)*PEOPLE_K }); }
+        reciteN=m.n; setActs();
+        if (m.done){ bell(true); rays=Math.max(rays,.7); for (let i=0;i<30;i++) petals.push({ x:Math.random()*1080, y:-40-Math.random()*300, vx:(Math.random()-.5)*40, vy:110+Math.random()*80, t:0, life:6+Math.random()*2, s:.14+Math.random()*.12 });
+          showChant(`Đại chúng đã cùng niệm đủ 108 biến Nam mô A Di Đà Phật · vòng ${m.rounds}`, '✦ VIÊN MÃN 108 BIẾN ✦', 8000); } } break;
+      case 'candle': { candleList.push({ id:m.id, name:m.name }); setActs(); setTicker({ name:m.name, label:'thắp nến cầu an 🕯️' }, true);
+        const v=visitors.get(m.id); if (v){ v.glow=1; v.active=now; } } break;
+      case 'candles': candleList=m.list||[]; setActs(); break;
+      case 'social': { setTicker({ name:m.name, label: m.kind==='follow' ? 'theo dõi chánh điện 💛' : 'chia sẻ buổi lễ 🔗' }, true);
+        const v=visitors.get(m.id); if (v){ v.glow=1; v.active=now; hearts(v,4); } } break;
+      case 'badge': { const v=visitors.get(m.id); if (v){ v.badge=m.badge; v.glow=.8; v.active=now; } } break;
+      case 'quiz': showQuiz(m); break;
+      case 'quizCount': if ($('quiz').classList.contains('show')) $('quizFoot').textContent=`Bình luận A, B hoặc C · ${m.n} người đã trả lời`; break;
+      case 'quizEnd': endQuizUi(m); break;
+      case 'dedicate': showChant(m.names.join(', ') + (m.more ? ` cùng ${m.more} Phật tử khác` : '') + (m.candles ? ` · ${m.candles} ngọn nến cầu an` : ''), '✦ HỒI HƯỚNG CÔNG ĐỨC ✦', 16000); bowWave(); candleFlare=1;
         for (const v of visitors.values()) if (!v.demo) v.glow=.8; break;
       case 'bell': bell(true); rays=Math.max(rays,.5); break;
       case 'mo1': mo(); break;
@@ -565,7 +635,7 @@ function applySettings(){
   $('title').textContent=settings.title||'Chánh Điện Tịnh Tâm';
   $('subtitle').textContent=settings.subtitle||'Nam Mô A Di Đà Phật';
   const fk=(settings.frameSize||100)/100; if (fk!==FRAME_K){ FRAME_K=fk; fit(); sizeCanvas(); }
-  PEOPLE_K=(settings.peopleSize||120)/100; setGoal();
+  PEOPLE_K=(settings.peopleSize||120)/100; setGoal(); setActs();
   { const tips=inviteTips(); $('inviteTip').textContent = tips[inviteIdx % tips.length]; }
   duck(false); scheduleMo();
 }
@@ -665,6 +735,13 @@ function frame(now){
   // candle warmth on the altar, incense smoke from the burner
   ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.05; ctx.fillStyle='#ffb347'; ctx.fillRect(0,380,1080,450); ctx.restore();
   ctx.save(); ctx.fillStyle='#efe3cc'; for (let i=0;i<smoke.length;i++){ const a=(t*.08+smoke[i])%1; ctx.globalAlpha=.24*(1-a); ctx.beginPath(); ctx.arc(540+Math.sin(a*7+i)*16*a, 645-a*210, 3+a*13, 0, 6.28); ctx.fill(); } ctx.restore();
+  // candles lit by viewers, in rows along the foot of the altar platform (larger than life so they read on a phone);
+  // they flare at the dedication
+  candleFlare=Math.max(0, candleFlare-dt*.3);
+  for (let i=0; i<candleList.length && i<CANDLE_SLOTS.length; i++){ const c=CANDLE_SLOTS[i], k=depth(c.y)*2.3;
+    ctx.fillStyle='#f3e6c8'; ctx.fillRect(c.x-2.5*k, c.y-14*k, 5*k, 14*k);
+    glow(c.x, c.y-17*k, (9+candleFlare*16)*k, .45+candleFlare*.45);
+    ctx.fillStyle='#ffd27a'; ctx.beginPath(); ctx.ellipse(c.x, c.y-17*k, 2.2*k, 4*k, 0, 0, 6.29); ctx.fill(); }
   // teachers and the abbot at the head of the carpet
   for (const tc of TEACHERS) figure(tc.skin, tc.x, tc.y, depth(tc.y)*PEOPLE_K, 'sit', 0, 0);
   if (A.abbot.naturalWidth){
@@ -708,7 +785,7 @@ function frame(now){
     const top = figure(v.skin, v.x, v.y, k, v.state, v.step, lift, v.wp);
     ctx.restore();
     const fs=Math.max(18,Math.round(25*depth(v.y)*v.big)), ty=v.y-top-fs*.9 - (v.rank<10 && v.state==='sit' && (v.rank>>1)&1 ? fs*1.5 : 0);   // neighbouring donors' names step up and down
-    if (showAll || now-v.active<25000 || v.rank<10) labels.push([v.rank<10 ? now+1e6-v.rank : v.active, v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);   // top-10 donors always named, drawn on top
+    if (showAll || now-v.active<25000 || v.rank<10) labels.push([v.rank<10 ? now+1e6-v.rank : v.active, v.badge ? `${v.badge} ${v.name}` : v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);   // top-10 donors always named, drawn on top
     if (v.bubble && now<v.bubble.until) talk.push([v.bubble.at, v.bubble.text, v.x, ty-fs*.8]); else v.bubble=null;
   }
   labels.sort((a,b)=>a[0]-b[0]).forEach(l=>tag(...l.slice(1)));

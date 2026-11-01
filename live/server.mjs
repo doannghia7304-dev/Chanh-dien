@@ -41,6 +41,11 @@ const settings = {
   teach: true,                       // a comment "lời dạy" gets a short teaching on the banner, read out when the voice is free
   dedicate: true,                    // at the end of a session the merit is dedicated to the people present, by name
   giftHint: true,                    // after each periodic chant, a pointer to TikTok's gift button for a few seconds
+  recite: true,                      // comments "Nam mô ..." count toward a shared 108 (bell and a new round at 108)
+  quizEveryMin: 5,                   // a Buddhism quiz (comment A, B or C) every this many minutes (0 = off)
+  thankSocial: true,                 // new followers and sharers are thanked by name
+  candles: true,                     // "thắp nến" lights a candle with the viewer's name for the rest of the session
+  badges: true,                      // lotus badges on the name tag for staying 10 / 30 / 60 minutes
   joinOnEnter: false,               // also seat viewers who only enter the room
   gifts: { readAll: true, minDiamonds: 1 },
 };
@@ -77,7 +82,7 @@ function addLikes(n){
 
 let sessionEndsAt = Date.now() + settings.sessionMin * 60_000;
 function resetSession(){ sessionEndsAt = Date.now() + settings.sessionMin * 60_000; broadcast({ t:'session', endsAt: sessionEndsAt }); }
-setInterval(() => { if (Date.now() >= sessionEndsAt){ resetSession(); broadcast({ t:'bell' }); chant(); if (settings.dedicate) dedicate(); addLog('🔔 Hết khóa lễ, bắt đầu khóa mới'); } }, 1000);
+setInterval(() => { if (Date.now() >= sessionEndsAt){ resetSession(); broadcast({ t:'bell' }); chant(); if (settings.dedicate) dedicate(); clearCandles(); addLog('🔔 Hết khóa lễ, bắt đầu khóa mới'); } }, 1000);
 
 /* skins: sprites that exist in /assets. Walking strips exist for man / woman / granny. */
 // A comment changes the outfit only when it IS the keyword (≤ 3 words), so "Nam mô A Di Đà Phật" never reads as "nam".
@@ -99,9 +104,9 @@ const DEFAULT_SKINS = ['woman', 'man', 'woman', 'man', 'granny', 'grandpa'];
 const hashId = s => { let h = 2166136261; for (const c of String(s)) h = Math.imul(h ^ c.codePointAt(0), 16777619); return h >>> 0; };
 const defaultSkin = id => DEFAULT_SKINS[hashId(id) % DEFAULT_SKINS.length];
 
-function pub(v){ return { id:v.id, name:v.name, skin:v.skin, avatar:v.avatar||'', coins:v.coins, demo:!!v.demo }; }
+function pub(v){ return { id:v.id, name:v.name, skin:v.skin, avatar:v.avatar||'', coins:v.coins, demo:!!v.demo, badge:v.badge||'' }; }
 function snapshot(){ return { t:'state', settings, viewers:[...viewers.values()].map(pub), cap: capacity(), startedAt, tiktok: tiktokState,
-  stats, likeGoal, top: topDonors(), lastOffer, sessionEndsAt }; }
+  stats, likeGoal, top: topDonors(), lastOffer, sessionEndsAt, recite, candles: [...candles].map(([id, name]) => ({ id, name })) }; }
 
 function seat(id, name, opts = {}){
   let v = viewers.get(id);
@@ -128,6 +133,9 @@ function onChat(id, name, text, avatar){
   if (!isNew && want && want !== v.skin){ v.skin = want; broadcast({ t:'skin', id, skin: want }); }
   v.lastText = text; v.lastTextAt = Date.now();
   if (asksTeaching(text)) askTeaching(v);
+  if (recites(text)) onRecite(v);
+  if (lightsCandle(text)) lightCandle(v);
+  if (quiz){ const pick = quizAnswer(text); if (pick >= 0) answerQuiz(v, pick); }
   broadcast({ t:'chat', id, name: v.name, text });
 }
 
@@ -269,7 +277,7 @@ const CHANTS = [
   'Quán Tự Tại Bồ Tát hành thâm Bát Nhã Ba La Mật Đa thời, chiếu kiến ngũ uẩn giai không, độ nhất thiết khổ ách.',
 ];
 let chantIdx = 0, chantTimer = null;
-function chant(){ const text = CHANTS[chantIdx++ % CHANTS.length]; broadcast({ t:'chant', text }); say(text, { tag:'chant' }); }
+function chant(){ const text = CHANTS[chantIdx++ % CHANTS.length]; lastChantAt = Date.now(); broadcast({ t:'chant', text }); say(text, { tag:'chant' }); }
 function scheduleChant(){ clearInterval(chantTimer); if (settings.autoChant) chantTimer = setInterval(chant, Math.max(1, settings.chantEveryMin) * 60_000); }
 scheduleChant();
 
@@ -321,23 +329,155 @@ setInterval(giveTeaching, 2000);
 function dedicate(){
   const names = [...viewers.values()].filter(v => !v.demo).sort((a, b) => b.lastAt - a.lastAt).map(v => v.name);
   if (!names.length) return false;
-  const shown = names.slice(0, 12), more = names.length - shown.length;
-  broadcast({ t:'dedicate', names: shown, more });
-  say(`Hồi hướng công đức khóa lễ cho Phật tử ${shown.map(spoken).join(', ')}${more ? `, cùng ${more} Phật tử khác` : ''} đang có mặt trong chánh điện. Nguyện tất cả thân tâm an lạc, gia đạo bình an. Nam mô A Di Đà Phật.`, { tag:'dedicate' });
+  const shown = names.slice(0, 12), more = names.length - shown.length, lit = candles.size;
+  broadcast({ t:'dedicate', names: shown, more, candles: lit });
+  say(`Hồi hướng công đức khóa lễ cho Phật tử ${shown.map(spoken).join(', ')}${more ? `, cùng ${more} Phật tử khác` : ''} đang có mặt trong chánh điện${lit ? `, cùng ${lit} ngọn nến cầu an` : ''}. Nguyện tất cả thân tâm an lạc, gia đạo bình an. Nam mô A Di Đà Phật.`, { tag:'dedicate' });
   return true;
 }
 
-// Viewers who come in are welcomed by name: hearing their own name is what makes people stay. Names are gathered and read
-// together in one line, at most every 30 s, and only when no other line is waiting, so a gift is never kept behind them.
-const greetQueue = [];
-function welcome(v){ if (settings.greet && !v.demo && greetQueue.length < 50) greetQueue.push(v.name); }
+// Names worth saying out loud are gathered and read together in one line, at most every 30 s and only when no other line
+// is waiting (a gift is never kept behind them): newcomers (hearing your own name is what makes people stay), new
+// followers and sharers (thanking them in public makes others follow and share), and badges for staying.
+const announce = { greet: [], follow: [], share: [], badge: [] };
+const queueName = (kind, item) => { if (announce[kind].length < 50) announce[kind].push(item); };
+function welcome(v){ if (settings.greet && !v.demo) queueName('greet', v.name); }
+const nameList = names => {
+  names = [...new Set(names.map(spoken))]; const shown = names.slice(0, 4), rest = names.length - shown.length;
+  return rest > 0 ? `${shown.join(', ')} và ${rest} Phật tử khác` : shown.length > 1 ? `${shown.slice(0, -1).join(', ')} và ${shown.at(-1)}` : shown[0];
+};
 setInterval(() => {
-  if (!settings.greet){ greetQueue.length = 0; return; }
-  if (!greetQueue.length || ttsQueue.length) return;
-  const names = [...new Set(greetQueue.splice(0).map(spoken))], shown = names.slice(0, 4), rest = names.length - shown.length;
-  const list = rest > 0 ? `${shown.join(', ')} và ${rest} Phật tử khác` : shown.length > 1 ? `${shown.slice(0, -1).join(', ')} và ${shown.at(-1)}` : shown[0];
-  say(`Hoan hỷ chào đón Phật tử ${list} vào chánh điện. Nam mô A Di Đà Phật.`, { tag:'greet' });
+  if (!settings.greet) announce.greet.length = 0;
+  if (!settings.thankSocial){ announce.follow.length = 0; announce.share.length = 0; }
+  if (!settings.badges) announce.badge.length = 0;
+  if (ttsQueue.length) return;
+  const parts = [];
+  if (announce.greet.length) parts.push(`Hoan hỷ chào đón Phật tử ${nameList(announce.greet.splice(0))} vào chánh điện.`);
+  if (announce.follow.length) parts.push(`Cảm ơn Phật tử ${nameList(announce.follow.splice(0))} đã theo dõi chánh điện.`);
+  if (announce.share.length) parts.push(`Cảm ơn Phật tử ${nameList(announce.share.splice(0))} đã chia sẻ buổi lễ.`);
+  const byMins = new Map(); for (const b of announce.badge.splice(0)) byMins.set(b.mins, [...(byMins.get(b.mins) || []), b.name]);
+  for (const [mins, names] of byMins) parts.push(`Tùy hỷ Phật tử ${nameList(names)} đã tinh tấn ${mins} phút trong chánh điện.`);
+  if (parts.length) say(parts.join(' ') + ' Nam mô A Di Đà Phật.', { tag:'greet' });
 }, 30_000);
+function thankSocial(kind, id, name){
+  broadcast({ t:'social', kind, id, name });
+  addLog(kind === 'follow' ? `💛 ${name} theo dõi kênh` : `🔗 ${name} chia sẻ live`);
+  if (settings.thankSocial) queueName(kind, name);
+}
+
+// Niệm Phật together: every comment with "Nam mô ..." counts toward a shared 108; at 108 the bell rings and a new round
+// starts. One count per viewer every 3 s, so a pasted flood doesn't run the count.
+const RECITE_ROUND = 108;
+const recite = { n: 0, rounds: 0 };
+const recites = t => /\bnam mo\b/.test(plain(t));
+function onRecite(v){
+  if (!settings.recite || Date.now() - (v.recitedAt || 0) < 3000) return;
+  v.recitedAt = Date.now();
+  if (++recite.n < RECITE_ROUND){ broadcast({ t:'recite', id: v.id, ...recite }); return; }
+  recite.n = 0; recite.rounds++;
+  broadcast({ t:'recite', id: v.id, ...recite, done: true }); addLog(`📿 Viên mãn ${RECITE_ROUND} biến niệm Phật (vòng ${recite.rounds})`);
+  say(`Đại chúng đã cùng niệm đủ ${RECITE_ROUND} biến. Nguyện cho tất cả thân tâm an lạc. Nam mô A Di Đà Phật.`, { tag:'recite' });
+}
+
+// Thắp nến cầu an: "thắp nến" lights a candle on the tray before the altar for the rest of the session; the dedication at
+// its end counts them, then the tray is cleared for the next one. One candle per viewer, 80 at most.
+const candles = new Map();           // id -> name
+const lightsCandle = t => /\bthap (nen|den)\b/.test(plain(t));
+function lightCandle(v){
+  if (!settings.candles || candles.has(v.id) || candles.size >= 80) return;
+  candles.set(v.id, v.name); broadcast({ t:'candle', id: v.id, name: v.name, n: candles.size });
+}
+function clearCandles(){ candles.clear(); broadcast({ t:'candles', list: [] }); }
+
+// Badges for staying: a viewer still active in the hall (a comment or a heart in the last 10 minutes) gets one lotus at 10
+// minutes since they sat down, two at 30, three at 60. The name tag shows it and the next announcement names them.
+const BADGES = [[10, '🪷'], [30, '🪷🪷'], [60, '🪷🪷🪷']];
+setInterval(() => {
+  if (!settings.badges) return;
+  const now = Date.now();
+  for (const v of viewers.values()){
+    if (v.demo || now - v.lastAt > 600_000) continue;
+    const lvl = BADGES.filter(([m]) => now - v.joinedAt >= m * 60_000).length;
+    if (lvl <= (v.badgeLvl || 0)) continue;
+    v.badgeLvl = lvl; v.badge = BADGES[lvl - 1][1];
+    broadcast({ t:'badge', id: v.id, badge: v.badge }); queueName('badge', { name: v.name, mins: BADGES[lvl - 1][0] });
+  }
+}, 15_000);
+
+// Đố vui Phật pháp: every quizEveryMin minutes a question with three answers; viewers comment A, B or C (their first answer
+// counts). After 30 s: the answer, the first right names, and the Bảng Trí Tuệ (a point per right answer, this run).
+// The first option written is the right one; the order is shuffled each time a question is asked.
+const QUIZ = [
+  ['Đức Phật Thích Ca đản sinh ở đâu?', 'Vườn Lâm Tỳ Ni', 'Bồ Đề Đạo Tràng', 'Câu Thi Na'],
+  ['Đức Phật thành đạo dưới cội cây gì?', 'Cây bồ đề', 'Cây đa', 'Cây sala'],
+  ['Đức Phật nhập Niết bàn ở đâu?', 'Câu Thi Na', 'Vườn Lộc Uyển', 'Núi Linh Thứu'],
+  ['Đức Phật giảng bài pháp đầu tiên ở đâu?', 'Vườn Lộc Uyển', 'Tinh xá Kỳ Viên', 'Tinh xá Trúc Lâm'],
+  ['Tên của Đức Phật khi còn là thái tử?', 'Tất Đạt Đa', 'A Nan Đà', 'La Hầu La'],
+  ['Phụ vương của Đức Phật là vua nào?', 'Vua Tịnh Phạn', 'Vua A Dục', 'Vua Tần Bà Sa La'],
+  ['Mẫu hậu của Đức Phật là ai?', 'Hoàng hậu Ma Da', 'Công chúa Da Du Đà La', 'Bà Ma Ha Ba Xà Ba Đề'],
+  ['Tam Bảo gồm những gì?', 'Phật, Pháp, Tăng', 'Giới, Định, Tuệ', 'Thân, Khẩu, Ý'],
+  ['Tam độc là gì?', 'Tham, sân, si', 'Sinh, lão, tử', 'Thân, khẩu, ý'],
+  ['Tứ Diệu Đế có mấy chân lý?', 'Bốn', 'Ba', 'Tám'],
+  ['Bát Chánh Đạo có mấy chi?', 'Tám', 'Sáu', 'Mười'],
+  ['Phật tử tại gia thường thọ trì mấy giới?', 'Năm giới', 'Tám giới', 'Mười giới'],
+  ['Vị Bồ Tát lắng nghe tiếng kêu cứu khổ của chúng sinh?', 'Quán Thế Âm', 'Văn Thù', 'Phổ Hiền'],
+  ['Bồ Tát Văn Thù tiêu biểu cho điều gì?', 'Trí tuệ', 'Từ bi', 'Hạnh nguyện'],
+  ['Lễ Phật Đản ở Việt Nam vào ngày nào âm lịch?', 'Rằm tháng Tư', 'Rằm tháng Giêng', 'Rằm tháng Bảy'],
+  ['Lễ Vu Lan báo hiếu vào ngày nào âm lịch?', 'Rằm tháng Bảy', 'Rằm tháng Tám', 'Rằm tháng Mười'],
+  ['Đức Phật A Di Đà là giáo chủ cõi nào?', 'Tây Phương Cực Lạc', 'Đông Phương Tịnh Lưu Ly', 'Cõi Ta Bà'],
+  ['Đức Phật Dược Sư là giáo chủ cõi nào?', 'Đông Phương Tịnh Lưu Ly', 'Tây Phương Cực Lạc', 'Cung trời Đâu Suất'],
+  ['Vị đệ tử được gọi là Đa văn đệ nhất?', 'Ngài A Nan', 'Ngài Ca Diếp', 'Ngài Mục Kiền Liên'],
+  ['Vị đệ tử được gọi là Thần thông đệ nhất?', 'Ngài Mục Kiền Liên', 'Ngài Xá Lợi Phất', 'Ngài Tu Bồ Đề'],
+  ['Vị đệ tử được gọi là Trí tuệ đệ nhất?', 'Ngài Xá Lợi Phất', 'Ngài A Nan', 'Ngài La Hầu La'],
+  ['Tích Mục Kiền Liên cứu mẹ gắn với lễ nào?', 'Lễ Vu Lan', 'Lễ Phật Đản', 'Lễ Thành Đạo'],
+  ['Bồ Tát nào phát nguyện "Địa ngục chưa trống, thề không thành Phật"?', 'Địa Tạng', 'Quán Thế Âm', 'Di Lặc'],
+  ['Vị Phật tương lai sẽ ra đời là ai?', 'Phật Di Lặc', 'Phật A Di Đà', 'Phật Dược Sư'],
+  ['Vị vua Ấn Độ hộ trì Phật pháp, dựng nhiều trụ đá khắc chỉ dụ?', 'Vua A Dục', 'Vua Tịnh Phạn', 'Vua Ba Tư Nặc'],
+  ['Ai sáng lập Thiền phái Trúc Lâm Yên Tử?', 'Vua Trần Nhân Tông', 'Vua Lý Công Uẩn', 'Vua Lê Thánh Tông'],
+  ['Trong Lục độ, hạnh nào đứng đầu?', 'Bố thí', 'Trì giới', 'Nhẫn nhục'],
+  ['Kinh nào mở đầu bằng "Quán Tự Tại Bồ Tát..."?', 'Bát Nhã Tâm Kinh', 'Kinh Pháp Hoa', 'Kinh Địa Tạng'],
+  ['"Nam mô" nghĩa là gì?', 'Quy y, kính lạy', 'Cầu xin', 'Tạm biệt'],
+  ['Loài hoa tượng trưng cho sự thanh tịnh trong Phật giáo?', 'Hoa sen', 'Hoa hồng', 'Hoa cúc'],
+  ['Chùa Một Cột ở thành phố nào?', 'Hà Nội', 'Huế', 'Đà Nẵng'],
+  ['Chùa Thiên Mụ ở thành phố nào?', 'Huế', 'Hà Nội', 'Hội An'],
+];
+const QUIZ_SEC = 30;
+const quizOrder = QUIZ.map((_, i) => i).sort(() => Math.random() - .5);
+const quizScores = new Map();        // id -> { id, name, score }
+let quiz = null, quizIdx = 0, lastQuizAt = Date.now(), lastChantAt = 0, quizCountTimer = null;
+const quizAnswer = t => { const m = plain(t).match(/^\s*(?:dap an\s*)?([abc])\s*[.!]*\s*$/); return m ? 'abc'.indexOf(m[1]) : -1; };
+// The question goes up together with its voice: Edge can take 20 s to answer, and a voice that comes in when the time is
+// nearly over is no use. If the voice isn't there within 12 s the question goes up without it.
+function startQuiz(){
+  if (quiz) return false;
+  const [q, ...opts] = QUIZ[quizOrder[quizIdx++ % QUIZ.length]], order = [0, 1, 2].sort(() => Math.random() - .5);
+  const qz = quiz = { q, options: order.map(i => opts[i]), right: order.indexOf(0), ready: false, answers: new Map() };
+  const text = `Câu đố Phật pháp. ${q} A, ${qz.options[0]}. B, ${qz.options[1]}. C, ${qz.options[2]}. Mời đại chúng bình luận A, B hoặc C.`;
+  const go = url => {
+    if (qz.ready || quiz !== qz) return; qz.ready = true; lastQuizAt = Date.now();
+    broadcast({ t:'quiz', q, options: qz.options, endsAt: Date.now() + QUIZ_SEC * 1000 });
+    if (url) broadcast({ t:'tts', url, text, tag:'quiz' });
+    setTimeout(endQuiz, QUIZ_SEC * 1000);
+  };
+  addLog(`❓ Câu đố: ${q}`);
+  makeVoice(text, 'quiz').then(go, () => go()); setTimeout(() => go(), 12_000);
+  return true;
+}
+function answerQuiz(v, pick){
+  if (!quiz?.ready || quiz.answers.has(v.id)) return;
+  quiz.answers.set(v.id, { id: v.id, name: v.name, pick });
+  quizCountTimer ||= setTimeout(() => { quizCountTimer = null; if (quiz) broadcast({ t:'quizCount', n: quiz.answers.size }); }, 1000);
+}
+function endQuiz(){
+  if (!quiz) return; const qz = quiz; quiz = null; lastQuizAt = Date.now();
+  const right = [...qz.answers.values()].filter(a => a.pick === qz.right);           // in the order they answered
+  for (const a of right){ const s = quizScores.get(a.id) || { id: a.id, name: a.name, score: 0 }; s.name = a.name; s.score++; quizScores.set(a.id, s); }
+  const top = [...quizScores.values()].sort((a, b) => b.score - a.score).slice(0, 3);
+  broadcast({ t:'quizEnd', right: qz.right, winners: right.slice(0, 5).map(a => a.name), nRight: right.length, nAll: qz.answers.size, top });
+  say(`Đáp án đúng là ${'ABC'[qz.right]}, ${qz.options[qz.right]}.${right.length ? ` Chúc mừng Phật tử ${nameList(right.map(a => a.name))} đã trả lời đúng.` : ''}`, { tag:'quiz' });
+}
+setInterval(() => {
+  if (settings.quizEveryMin && !quiz && Date.now() - lastQuizAt >= settings.quizEveryMin * 60_000 && Date.now() - lastChantAt > 40_000) startQuiz();
+}, 5000);
 
 /* --------------------------------------------------------------- TikTok */
 let TikTokLib = null;
@@ -366,7 +506,9 @@ async function connectTikTok(uniqueId){
       addLog(`🎁 ${nm(d.user)} tặng ${gname} x${d.repeatCount || 1}`);
     });
     conn.on(WebcastEvent.MEMBER, d => { const id = uid(d.user); if (settings.joinOnEnter && id){ const { v, isNew } = seat(id, nm(d.user), { avatar: av(d.user) }); if (v && isNew) welcome(v); } });
-    conn.on(WebcastEvent.LIKE, d => { const n = d.count || d.likeCount || 1; addLikes(n); broadcast({ t:'like', id: uid(d.user), n }); });
+    conn.on(WebcastEvent.LIKE, d => { const n = d.count || d.likeCount || 1, id = uid(d.user), v = viewers.get(id); if (v) v.lastAt = Date.now(); addLikes(n); broadcast({ t:'like', id, n }); });
+    conn.on(WebcastEvent.FOLLOW, d => { const id = uid(d.user); if (id) thankSocial('follow', id, nm(d.user)); });
+    conn.on(WebcastEvent.SHARE, d => { const id = uid(d.user); if (id) thankSocial('share', id, nm(d.user)); });
     conn.on(ControlEvent.DISCONNECTED, () => { tiktokState = { ...tiktokState, status: 'disconnected' }; broadcast({ t:'tiktok', ...tiktokState }); addLog('TikTok: mất kết nối'); });
     conn.on(ControlEvent.ERROR, e => addLog('TikTok lỗi: ' + (e?.info || e?.message || e)));
     const st = await conn.connect();
@@ -415,6 +557,8 @@ function onControl(m){
     case 'chant': chant(); break;
     case 'procession': broadcast({ t:'procession' }); break;
     case 'giftHint': broadcast({ t:'gifthint' }); break;
+    case 'quiz': if (!startQuiz()) addLog('Đang có câu đố, đợi câu này xong'); break;
+    case 'social': { const n = String(m.name || 'Khách').slice(0, 18); thankSocial(m.kind === 'share' ? 'share' : 'follow', 'sim_' + n, n); break; }
     case 'lotus': broadcast({ t:'likegoal', goal: likeGoal || settings.likeStep || 1000, next: likeGoal }); break;   // try the lotus rain, the count stays
     case 'dedicate': if (!dedicate()) addLog('Chưa có người xem thật trong chánh điện để hồi hướng'); break;
     case 'say': if (m.text) say(String(m.text).slice(0, 400), { tag:'say' }); break;
@@ -438,6 +582,8 @@ const SETTING_RULES = {
   likeStep: v => [0, 300, 500, 1000, 2000, 5000].includes(+v) ? +v : settings.likeStep,
   music: Boolean, mo: Boolean, autoChant: Boolean, joinOnEnter: Boolean, ttsFallback: Boolean, greet: Boolean,
   procession: Boolean, teach: Boolean, dedicate: Boolean, giftHint: Boolean,
+  recite: Boolean, thankSocial: Boolean, candles: Boolean, badges: Boolean,
+  quizEveryMin: v => [0, 3, 5, 10, 15].includes(+v) ? +v : settings.quizEveryMin,
   seatMode: v => ['auto', '50', '100', '150', '200'].includes(String(v)) ? String(v) : 'auto',
 };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, Math.round(+v || 0)));

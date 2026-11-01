@@ -34,6 +34,14 @@ Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người 
 - **Thả tim**: tim bay trên đầu nhân vật. Mỗi 1.000 tim (chỉnh được, hoặc tắt) thì mưa hoa sen khắp chánh điện, thỉnh chuông và cảm ơn đại chúng. Thanh tiến độ tới lần mưa hoa kế tiếp nằm dưới bộ đếm Thả tim.
 - **Bình luận "lời dạy"** (hay "xin lời Phật dạy"): nhận một lời Phật dạy ngắn trên banner kèm tên mình, đọc thành tiếng khi giọng đọc đang rảnh. Mỗi người 5 phút một lần; nhiều người hỏi thì 12 giây một lời.
 
+- **Bình luận "Nam mô..."** (Nam mô A Di Đà Phật, Nam mô Quán Thế Âm...): cùng niệm Phật. Mỗi câu cộng vào vòng 108 chung (thẻ "📿 Cùng niệm Phật 37/108" ở cột trái), nhân vật cúi lạy và một bông sen nhỏ bay lên. Đủ 108 thì thỉnh chuông, mưa hoa và báo viên mãn một vòng. Mỗi người tối đa một câu mỗi 3 giây.
+- **Bình luận "thắp nến"**: một ngọn nến cầu an được thắp trên hai hàng nến dưới chân bục bàn thờ, cháy tới hết khóa lễ (mỗi người một ngọn, tối đa 80). Lúc hồi hướng, các ngọn nến cùng bừng sáng và được nhắc tới, rồi khay nến dọn cho khóa mới.
+- **Đố vui Phật pháp**: mỗi 5 phút (chỉnh được hoặc tắt) hiện một câu hỏi có ba đáp án A, B, C, đọc thành tiếng nếu giọng đọc rảnh. Người xem bình luận A, B hoặc C (tính câu trả lời đầu tiên). Sau 30 giây: đáp án đúng sáng lên, đọc tên người trả lời đúng sớm nhất, và **Bảng Trí Tuệ** (mỗi câu đúng một điểm). Có sẵn 32 câu kiến thức phổ thông về Phật giáo.
+- **Theo dõi / chia sẻ**: được xướng tên cảm ơn và hiện ở dòng thông báo cột trái.
+- **Ở lại lâu**: còn bình luận hoặc thả tim trong 10 phút gần nhất thì sau 10 / 30 / 60 phút ngồi trong chánh điện được huy hiệu 🪷 / 🪷🪷 / 🪷🪷🪷 trước tên, và được xướng tên.
+
+Câu chào người mới, cảm ơn theo dõi/chia sẻ và chúc mừng huy hiệu được gộp vào một câu, tối đa 30 giây một câu, và chỉ đọc khi không có câu nào khác đang chờ.
+
 ### Hoạt cảnh
 
 - **Kinh hành**: mỗi lần đọc kinh định kỳ, đoàn 8 vị sư và ni (cao tăng đi đầu) vào từ cột bên trái, đi xuống lối đi bên trái, vòng ra sau rồi đi lên lối bên phải và ra ở cột bên phải, mất khoảng nửa phút. Cả chánh điện cùng lạy, lần lượt từ hàng đầu xuống.
@@ -41,7 +49,7 @@ Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người 
 - **Chỉ nút Quà**: video live không bấm được, nên không thể có nút tặng quà trên overlay. Thay vào đó, sau mỗi lần đọc kinh một nút "🎁 Quà ↘" hiện 12 giây ở góc phải, mũi tên chỉ xuống nút Quà của TikTok; có quà tới thì dòng này tự ẩn. Muốn có món quà bấm được trên màn hình người xem thì dùng công cụ của TikTok như Mục tiêu LIVE.
 - **Cỡ người**: Phật tử vẽ to hơn khoảng cách chỗ ngồi (mặc định 120%) cho chánh điện trông đông đúc.
 
-Bảng điều khiển có nút **Kinh hành ngay**, **Thử mưa hoa sen** và **Hồi hướng ngay** để chủ động tạo cao trào hoặc thử trước khi live.
+Bảng điều khiển có nút **Kinh hành ngay**, **Thử mưa hoa sen**, **Hồi hướng ngay**, **Ra câu đố ngay**, **Thử theo dõi** và **Thử chia sẻ** để chủ động tạo cao trào hoặc thử trước khi live.
 
 Chánh điện không đứng yên: người ngồi lần lượt đứng dậy đi lạy rồi về chỗ. Người ở giữa đi theo thảm đỏ lên sau lưng sư trụ trì. Người hai bên đi theo hai lối đi bên (chạy theo phối cảnh từ cạnh thảm đỏ ra hai mép), lên lạy trước bục dưới hai cây đèn vàng. Mức **Người đi lại** trong bảng điều khiển chọn từ yên tĩnh tới rất nhộn nhịp (mặc định nhộn nhịp: tối đa 3 người trên thảm đỏ và 4 người ở hai bên cùng lúc). Mỗi người đi chỉ thay đổi một phần nhỏ khung hình nên hình live vẫn nét.
 
