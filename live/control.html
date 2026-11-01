@@ -78,7 +78,7 @@ button.red{background:var(--red);border-color:#b84a33}
       <button data-gift="Nén hương" data-dia="5">Lễ Phật · 5</button>
       <button data-gift="Đèn hoa sen" data-dia="30">Hoa sen · 30</button>
     </div>
-    <p class="hint">Gõ <b>nam · nữ · ông · bà · sư · ni · tiểu · cao tăng</b> làm bình luận để đổi hình. Quà 1 xu tính là Dâng hương, 5 xu là Lễ Phật, từ 10 xu là Hoa sen.</p>
+    <p class="hint">Gõ <b>nam · nữ · ông · bà · sư · ni · tiểu · cao tăng</b> làm bình luận để đổi hình. Quà dưới 10 xu (Hoa hồng) tính là Dâng hương, 10–99 xu (Cỏ bốn lá) là Lễ Phật, từ 100 xu (Thả tim) là Hoa sen.</p>
     <h2>Đổ người mẫu</h2>
     <div class="row"><button data-fill="30">30</button><button data-fill="50">50</button><button data-fill="100">100</button><button data-fill="150">150</button><button data-fill="200">200</button></div>
     <p class="hint">Bấm số nào thì chánh điện có đúng chừng đó người mẫu (thêm hoặc bớt). Người xem thật và bot không bị ảnh hưởng.</p>
@@ -131,9 +131,10 @@ button.red{background:var(--red);border-color:#b84a33}
     <label class="check"><input type="checkbox" id="procession" checked> Đoàn sư kinh hành theo hai lối đi bên mỗi lần đọc kinh định kỳ (cả chánh điện cùng lạy)</label>
     <label class="check"><input type="checkbox" id="teach" checked> Người xem gõ "lời dạy" thì nhận một lời Phật dạy có tên mình (mỗi người 5 phút một lần)</label>
     <label class="check"><input type="checkbox" id="dedicate" checked> Hết khóa lễ thì hồi hướng, đọc tên người xem đang có mặt</label>
+    <label class="check"><input type="checkbox" id="giftHint" checked> Sau mỗi lần đọc kinh, hiện nút "🎁 Quà ↘" chỉ xuống nút Quà của TikTok trong 12 giây</label>
     <label>Mục tiêu thả tim<select id="likeStep"><option value="0">Tắt</option><option value="300">Mỗi 300 tim</option><option value="500">Mỗi 500 tim</option><option value="1000">Mỗi 1.000 tim</option><option value="2000">Mỗi 2.000 tim</option><option value="5000">Mỗi 5.000 tim</option></select></label>
     <p class="hint">Đủ số tim thì mưa hoa sen khắp chánh điện, thỉnh chuông và cảm ơn đại chúng. Thanh tiến độ hiện dưới bộ đếm Thả tim.</p>
-    <div class="row"><button id="btnProcession">Kinh hành ngay</button><button id="btnLotus">Thử mưa hoa sen</button><button id="btnDedicate">Hồi hướng ngay</button></div>
+    <div class="row"><button id="btnProcession">Kinh hành ngay</button><button id="btnLotus">Thử mưa hoa sen</button><button id="btnDedicate">Hồi hướng ngay</button><button id="btnGiftHint">Chỉ nút Quà ngay</button></div>
     <h2>Khóa lễ</h2>
     <div class="row"><button id="btnSession">⏱ Bắt đầu lại khóa lễ</button><button id="btnResetStats">Xóa bảng lễ vật</button></div>
     <p class="hint">Hết giờ khóa lễ thì tự thỉnh chuông, đọc kinh, hồi hướng (nếu bật) rồi đếm lại. "Xóa bảng lễ vật" đặt các bộ đếm và bảng Tấm Lòng Thành về 0.</p>
@@ -151,7 +152,7 @@ const $ = id => document.getElementById(id);
 let ws = null;
 const send = (cmd, extra={}) => ws?.readyState===1 && ws.send(JSON.stringify({ t:'ctl', cmd, ...extra }));
 function logLine(s){ const el=$('log'); el.textContent += s + '\n'; el.scrollTop = el.scrollHeight; }
-const SETTING_IDS = ['voice','pitch','rate','music','mo','autoChant','moBpm','chantEveryMin','title','subtitle','seatMode','sessionMin','frameSize','joinOnEnter','ttsFallback','greet','bustle','peopleSize','procession','teach','dedicate','likeStep'];
+const SETTING_IDS = ['voice','pitch','rate','music','mo','autoChant','moBpm','chantEveryMin','title','subtitle','seatMode','sessionMin','frameSize','joinOnEnter','ttsFallback','greet','bustle','peopleSize','procession','teach','dedicate','likeStep','giftHint'];
 function fillSettings(s){ for (const k of SETTING_IDS){ const el=$(k); if (!el || s[k]===undefined) continue; if (el.type==='checkbox') el.checked=!!s[k]; else el.value=s[k]; } }
 function readSettings(){ const o={}; for (const k of SETTING_IDS){ const el=$(k); o[k] = el.type==='checkbox' ? el.checked : el.type==='number' ? +el.value : el.value; } return o; }
 const people = new Map();
@@ -208,6 +209,7 @@ $('btnChant').onclick = () => send('chant');
 $('btnProcession').onclick = () => send('procession');
 $('btnLotus').onclick = () => send('lotus');
 $('btnDedicate').onclick = () => send('dedicate');
+$('btnGiftHint').onclick = () => send('giftHint');
 $('btnBell').onclick = () => send('bell');
 $('btnMo').onclick = () => send('mo');
 $('btnSession').onclick = () => send('session');

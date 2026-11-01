@@ -41,10 +41,12 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 #goalText{display:block;font-size:20px;color:var(--muted);text-align:center;white-space:nowrap}
 #people{margin-top:6px;padding-top:8px;border-top:1px solid rgba(226,176,79,.22);text-align:center;font-size:24px}
 #people b{color:var(--gold2);font-variant-numeric:tabular-nums}
-/* bottom: latest offering, top donors */
-#bar{left:16px;right:16px;bottom:22px;height:240px;display:grid;grid-template-columns:1fr 370px;gap:14px}
-#left{align-self:end;display:grid;min-width:0}
-#ticker{justify-self:center;max-width:100%;box-sizing:border-box;font:600 34px var(--body);padding:8px 28px;border-radius:999px;background:rgba(20,9,4,.84);border:2px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* bottom right: top donors */
+#bar{right:16px;bottom:22px;width:370px;height:240px;display:grid}
+/* left column under the price list: the invite to comment, then the latest offering (TikTok's comment feed covers the
+   bottom left of the screen, so nothing of ours sits there) */
+#side{left:20px;top:518px;max-width:680px;display:grid;gap:12px;justify-items:start}
+#ticker{max-width:100%;box-sizing:border-box;font:600 30px var(--body);padding:8px 26px;border-radius:999px;background:rgba(20,9,4,.84);border:2px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ticker b{color:var(--gold2)}
 #ticker i{font-style:normal;color:var(--fg);margin-left:12px;opacity:.85}
 #ticker.flash{animation:flash 1.4s}
@@ -57,10 +59,19 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 .lg small{font:700 21px var(--body);color:var(--gold2);letter-spacing:.05em}
 .lg span{font-size:26px;font-weight:600;white-space:nowrap}
 /* under the price list: what a passer-by can do for free, the reason to comment and stay; the second line changes every few seconds */
-#invite{left:20px;top:518px;max-width:600px;padding:10px 22px 12px 16px;display:grid;gap:3px;background:rgba(28,13,7,.62);box-shadow:none}
+#invite{max-width:100%;box-sizing:border-box;padding:10px 22px 12px 16px;display:grid;gap:3px;background:rgba(28,13,7,.62);box-shadow:none}
 #invite b{font:700 29px var(--body);color:var(--gold2);white-space:nowrap}
 #invite span{font-size:23px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .5s}
 #invite span.out{opacity:0}
+/* pointer to TikTok's own gift button (bottom right on a phone): the stream can't be tapped, so it only shows the way.
+   Up for a few seconds after each periodic chant, gone as soon as a gift banner needs the space. */
+#giftHint{right:24px;bottom:290px;display:flex;align-items:center;gap:10px;padding:8px 22px 8px 18px;border-radius:999px;
+  background:rgba(70,20,10,.92);border:2px solid var(--gold2);box-shadow:0 0 30px rgba(255,190,90,.35);font:700 36px var(--body);
+  color:var(--gold2);white-space:nowrap;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+#giftHint.show{opacity:1;transform:none}
+#giftHint .ic{font-size:46px;line-height:1}
+#giftHint .arrow{display:inline-block;margin-left:2px;font-size:50px;line-height:1;color:var(--gold2);animation:point 1s ease-in-out infinite}
+@keyframes point{50%{transform:translate(5px,8px)}}
 #board{padding:12px 16px}
 #board h3{margin:0 0 8px;text-align:center;font:700 29px var(--display);letter-spacing:.08em;color:var(--gold2)}
 #board ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
@@ -90,7 +101,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 /* enable sound (needed once: browsers block autoplay) */
 #unmute{position:absolute;z-index:9;left:50%;top:1440px;transform:translateX(-50%);font:600 36px var(--body);padding:22px 44px;border-radius:24px;border:3px solid var(--gold2);background:var(--red);color:#fff4dc;cursor:pointer}
 #conn{position:absolute;z-index:4;left:16px;top:12px;font-size:20px;color:var(--muted);opacity:.7}
-@media (prefers-reduced-motion:reduce){#chant,#gift{transition:none}.cnt.bump b,#ticker.flash{animation:none}}
+@media (prefers-reduced-motion:reduce){#chant,#gift,#giftHint{transition:none}.cnt.bump b,#ticker.flash,#giftHint .arrow{animation:none}}
 </style>
 </head>
 <body>
@@ -109,18 +120,19 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
     <div id="people"><b id="count">0</b> người đang lễ</div>
   </div>
   <div id="bar" class="ui">
-    <div id="left">
-      <div id="ticker"><b id="tkName">Nam Mô A Di Đà Phật</b><i id="tkWhat">tùy hỷ công đức</i></div>
-    </div>
     <div id="board" class="panel"><h3>TẤM LÒNG THÀNH</h3><ol id="boardList"><li class="empty">Chưa có</li></ol></div>
   </div>
   <div id="legend" class="ui">
-    <div class="lg panel"><img src="/assets/fx_incense.png" alt=""><div><small>1 COIN</small><span>Dâng hương</span></div></div>
-    <div class="lg panel"><img src="/assets/fx_halo.png" alt=""><div><small>5 COINS</small><span>Lễ Phật</span></div></div>
-    <div class="lg panel"><img src="/assets/fx_lotus.png" alt=""><div><small>10+ COINS</small><span>Hoa sen</span></div></div>
+    <div class="lg panel"><img src="/assets/gift_rose.png" alt=""><div><small>1 COIN</small><span>Dâng hương</span></div></div>
+    <div class="lg panel"><img src="/assets/gift_clover.png" alt=""><div><small>10 COINS</small><span>Lễ Phật</span></div></div>
+    <div class="lg panel"><img src="/assets/gift_heart.png" alt=""><div><small>100 COINS</small><span>Hoa sen</span></div></div>
   </div>
-  <div id="invite" class="panel ui"><b>💬 Bình luận để vào chánh điện</b><span id="inviteTip">Bạn sẽ ngồi ngay trên bồ đoàn</span></div>
+  <div id="side" class="ui">
+    <div id="invite" class="panel"><b>💬 Bình luận để vào chánh điện</b><span id="inviteTip">Bạn sẽ ngồi ngay trên bồ đoàn</span></div>
+    <div id="ticker"><b id="tkName">Nam Mô A Di Đà Phật</b><i id="tkWhat">tùy hỷ công đức</i></div>
+  </div>
   <div id="chant" class="ui"><h4 id="chantHead">✦ TỤNG KINH ĐỊNH KỲ ✦</h4><p id="chantText"></p></div>
+  <div id="giftHint" class="ui"><span class="ic">🎁</span>Quà<span class="arrow">↘</span></div>
   <div id="gift" class="ui"><div class="who" id="giftWho"></div><div class="what" id="giftWhat"></div><div class="pray" id="giftPray"></div></div>
   <button id="unmute">🔔 Bấm để bật âm thanh</button>
   <div id="conn">đang kết nối…</div>
@@ -308,8 +320,12 @@ setInterval(() => {
   const el = $('inviteTip'); el.classList.add('out');
   setTimeout(() => { const tips = inviteTips(); el.textContent = tips[++inviteIdx % tips.length]; el.classList.remove('out'); }, 500);
 }, 6000);
+let hintHide=null, hintTimer=null;
+function showGiftHint(ms=12000){ if (settings.giftHint===false) return; const el=$('giftHint'); el.classList.add('show'); clearTimeout(hintHide); hintHide=setTimeout(()=>el.classList.remove('show'), ms); }
+function hideGiftHint(){ clearTimeout(hintHide); $('giftHint').classList.remove('show'); }
 let giftHide=null;
 function showGift(m){
+  hideGiftHint();
   $('giftWho').textContent = m.name;
   $('giftWhat').textContent = `${m.label} · ${m.giftName}${m.count>1?' ×'+m.count:''} · công đức ${m.total}`;
   $('giftPray').textContent = '“' + m.prayer + '”';
@@ -531,7 +547,9 @@ function connect(){
       case 'session': sessionEndsAt=m.endsAt; break;
       case 'like': hearts(visitors.get(m.id),m.n); break;
       case 'tts': queueTTS(m.url); break;
-      case 'chant': showChant(m.text); bell(); bowWave(); if (settings.procession !== false) startProcession(); break;
+      case 'chant': showChant(m.text); bell(); bowWave(); if (settings.procession !== false) startProcession();
+        clearTimeout(hintTimer); hintTimer=setTimeout(showGiftHint, 14500); break;   // once the chant banner has gone
+      case 'gifthint': showGiftHint(); break;
       case 'procession': startProcession(); break;
       case 'likegoal': lotusRain(); setGoal(undefined, m.next); showChant('Cảm ơn đại chúng đã thả tim. Nguyện hoa sen nở khắp mười phương, ai nấy thân tâm an lạc.', `✦ ĐỦ ${fmt(m.goal)} TIM · MƯA HOA SEN ✦`, 9000); break;
       case 'teach': { const v=visitors.get(m.id); if (v){ v.glow=1; v.bow=1; v.active=now; } showChant(m.text, `✦ LỜI PHẬT DẠY · ${m.name} ✦`, 12000); } break;

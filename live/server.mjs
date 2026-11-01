@@ -40,6 +40,7 @@ const settings = {
   likeStep: 1000,                    // every this many hearts: lotus rain (0 = off)
   teach: true,                       // a comment "lời dạy" gets a short teaching on the banner, read out when the voice is free
   dedicate: true,                    // at the end of a session the merit is dedicated to the people present, by name
+  giftHint: true,                    // after each periodic chant, a pointer to TikTok's gift button for a few seconds
   joinOnEnter: false,               // also seat viewers who only enter the room
   gifts: { readAll: true, minDiamonds: 1 },
 };
@@ -52,10 +53,11 @@ function addLog(s){ const line = `[${new Date().toLocaleTimeString('vi-VN')}] ${
 const MAX_SEATS = 200;
 function capacity(){ return settings.seatMode === 'auto' ? MAX_SEATS : +settings.seatMode; }
 
-/* offerings: every gift falls in one of three tiers by its per-unit diamond value (legend on the overlay: 1 / 5 / 10+ coins) */
+/* offerings: every gift falls in one of three tiers by its per-unit diamond value. The overlay legend shows the gift for
+   each: Rose (1 coin) is Dâng hương, Four-leaf clover (10) is Lễ Phật, the 100-coin heart is Hoa sen. */
 const stats = { incense: 0, bow: 0, lotus: 0, likes: 0 };
 const OFFER_LABEL = { incense: 'Dâng hương', bow: 'Lễ Phật', lotus: 'Hoa sen' };
-const offerKind = dia => dia >= 10 ? 'lotus' : dia >= 5 ? 'bow' : 'incense';
+const offerKind = dia => dia >= 100 ? 'lotus' : dia >= 10 ? 'bow' : 'incense';
 const donors = new Map();            // id -> { name, coins }; outlives the seat so the board survives being bumped
 let lastOffer = null;                // { name, label }
 const topDonors = () => [...donors.values()].sort((a, b) => b.coins - a.coins).slice(0, 3);
@@ -412,6 +414,7 @@ function onControl(m){
     case 'mo': broadcast({ t:'mo1' }); break;
     case 'chant': chant(); break;
     case 'procession': broadcast({ t:'procession' }); break;
+    case 'giftHint': broadcast({ t:'gifthint' }); break;
     case 'lotus': broadcast({ t:'likegoal', goal: likeGoal || settings.likeStep || 1000, next: likeGoal }); break;   // try the lotus rain, the count stays
     case 'dedicate': if (!dedicate()) addLog('Chưa có người xem thật trong chánh điện để hồi hướng'); break;
     case 'say': if (m.text) say(String(m.text).slice(0, 400), { tag:'say' }); break;
@@ -434,7 +437,7 @@ const SETTING_RULES = {
   sessionMin: v => clamp(v, 5, 240), frameSize: v => clamp(v, 70, 100), bustle: v => clamp(v, 0, 3), peopleSize: v => clamp(v, 100, 150),
   likeStep: v => [0, 300, 500, 1000, 2000, 5000].includes(+v) ? +v : settings.likeStep,
   music: Boolean, mo: Boolean, autoChant: Boolean, joinOnEnter: Boolean, ttsFallback: Boolean, greet: Boolean,
-  procession: Boolean, teach: Boolean, dedicate: Boolean,
+  procession: Boolean, teach: Boolean, dedicate: Boolean, giftHint: Boolean,
   seatMode: v => ['auto', '50', '100', '150', '200'].includes(String(v)) ? String(v) : 'auto',
 };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, Math.round(+v || 0)));
@@ -456,8 +459,8 @@ function setBots(on, n, pace){
       if (r < .62) onChat(id, v.name, BOT_LINES[Math.floor(Math.random() * BOT_LINES.length)]);
       else if (r < .9) { const n = 1 + Math.floor(Math.random() * 4); addLikes(n); broadcast({ t:'like', id, n }); }
       else if (r < .96) onGift(id, v.name, 'Hoa hồng', 1 + Math.floor(Math.random() * 3), 1);
-      else if (r < .985) onGift(id, v.name, 'Nén hương', 1, 5);
-      else onGift(id, v.name, 'Đèn hoa sen', 1, 99);
+      else if (r < .985) onGift(id, v.name, 'Cỏ bốn lá', 1, 10);
+      else onGift(id, v.name, 'Thả tim', 1, 100);
     }, every);
     addLog(`🤖 Bật ${n} bot, nhịp ${pace}`);
   } else {

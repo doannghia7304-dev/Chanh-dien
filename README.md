@@ -38,13 +38,14 @@ Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người 
 
 - **Kinh hành**: mỗi lần đọc kinh định kỳ, đoàn 8 vị sư và ni (cao tăng đi đầu) vào từ cột bên trái, đi xuống lối đi bên trái, vòng ra sau rồi đi lên lối bên phải và ra ở cột bên phải, mất khoảng nửa phút. Cả chánh điện cùng lạy, lần lượt từ hàng đầu xuống.
 - **Hồi hướng cuối khóa lễ**: hết giờ khóa lễ, giọng đọc hồi hướng công đức, đọc tên tối đa 12 người xem đang có mặt (người mới hoạt động gần đây trước), cả chánh điện cùng lạy. Người ở lại tới cuối được nghe tên mình.
+- **Chỉ nút Quà**: video live không bấm được, nên không thể có nút tặng quà trên overlay. Thay vào đó, sau mỗi lần đọc kinh một nút "🎁 Quà ↘" hiện 12 giây ở góc phải, mũi tên chỉ xuống nút Quà của TikTok; có quà tới thì dòng này tự ẩn. Muốn có món quà bấm được trên màn hình người xem thì dùng công cụ của TikTok như Mục tiêu LIVE.
 - **Cỡ người**: Phật tử vẽ to hơn khoảng cách chỗ ngồi (mặc định 120%) cho chánh điện trông đông đúc.
 
 Bảng điều khiển có nút **Kinh hành ngay**, **Thử mưa hoa sen** và **Hồi hướng ngay** để chủ động tạo cao trào hoặc thử trước khi live.
 
 Chánh điện không đứng yên: người ngồi lần lượt đứng dậy đi lạy rồi về chỗ. Người ở giữa đi theo thảm đỏ lên sau lưng sư trụ trì. Người hai bên đi theo hai lối đi bên (chạy theo phối cảnh từ cạnh thảm đỏ ra hai mép), lên lạy trước bục dưới hai cây đèn vàng. Mức **Người đi lại** trong bảng điều khiển chọn từ yên tĩnh tới rất nhộn nhịp (mặc định nhộn nhịp: tối đa 3 người trên thảm đỏ và 4 người ở hai bên cùng lúc). Mỗi người đi chỉ thay đổi một phần nhỏ khung hình nên hình live vẫn nét.
 
-Overlay có đồng hồ đếm ngược khóa lễ (mặc định 60 phút, hết giờ tự thỉnh chuông và đọc kinh), bộ đếm Dâng hương · Lễ Phật · Hoa sen · Thả tim, bảng giá lễ 1 / 5 / 10+ xu và bảng **Tấm Lòng Thành** top 3. Quà dưới 5 xu tính là Dâng hương, 5–9 xu là Lễ Phật, từ 10 xu là Hoa sen.
+Overlay có đồng hồ đếm ngược khóa lễ (mặc định 60 phút, hết giờ tự thỉnh chuông và đọc kinh), bộ đếm Dâng hương · Lễ Phật · Hoa sen · Thả tim, bảng giá lễ ở góc trên bên trái (hình quà TikTok: Hoa hồng 1 xu, Cỏ bốn lá 10 xu, Thả tim 100 xu) và bảng **Tấm Lòng Thành** top 3. Quà dưới 10 xu tính là Dâng hương, 10–99 xu là Lễ Phật, từ 100 xu là Hoa sen (tính theo giá một món quà).
 
 ## Bảo mật
 
