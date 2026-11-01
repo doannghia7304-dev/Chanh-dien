@@ -20,18 +20,29 @@ npm start
 ```
 
 1. Mở `http://localhost:3000/live/control.html` (bảng điều khiển).
-2. Bấm **Mở màn hình overlay 9:16**, rồi bấm **Bật âm thanh** một lần trong cửa sổ đó (trình duyệt chặn tự phát tiếng).
-3. Trong TikTok LIVE Studio: *Add source → Window capture* → chọn cửa sổ overlay. Với OBS thì dùng *Browser source* trỏ tới `http://localhost:3000/live/overlay.html`, kích thước 1080×1920.
+2. Trong TikTok LIVE Studio: *Add source → Link*, dán `http://localhost:3000/live/overlay.html`, bật độ phân giải tùy chỉnh và đặt 1080×1920 (mặc định là 800×600: phải phóng to gần 4 lần, hình sẽ rất mờ). Chip **Overlay** trên bảng điều khiển hiện kích thước thật của nguồn Link và cảnh báo nếu chưa đúng. Với OBS thì dùng *Browser source* cùng địa chỉ và kích thước. Cách này nét nhất và tự phát tiếng. Không nên dùng *Window capture*: cửa sổ trình duyệt thấp hơn 1920 px nên hình bị phóng to, mờ, và dính thanh địa chỉ.
+3. Chỉ một overlay phát tiếng: nguồn Link được ưu tiên, các cửa sổ overlay khác (ví dụ **Mở màn hình overlay 9:16** để xem thử) tự im lặng nên không bị vọng tiếng. Chip **Overlay** trên bảng điều khiển cho biết tiếng đang phát ở đâu. Điện thoại cắt bớt hai mép khi xem LIVE; nếu mép cảnh bị mất, giảm **Kích thước khung hình** (mặc định 90%) trong bảng điều khiển.
 4. Bật LIVE trên TikTok, nhập `@username` vào bảng điều khiển, bấm **Kết nối**.
 
 Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người mẫu 30/80/150/200** hoặc **Bot mô phỏng**.
 
 ### Người xem làm được gì
 
-- **Bình luận bất kỳ**: đi dọc thảm đỏ vào quỳ (tối đa 200 chỗ), bình luận hiện thành bong bóng chữ trên đầu. Đầy chỗ thì người im lặng lâu nhất mà chưa tặng quà sẽ nhường chỗ.
+- **Bình luận bất kỳ**: đi dọc thảm đỏ vào quỳ (tối đa 200 chỗ), bình luận hiện thành bong bóng chữ trên đầu, và được xướng tên chào đón (nhiều người mới gộp vào một câu, tối đa 30 giây một câu, quà luôn được đọc trước; tắt được trong bảng điều khiển). Đầy chỗ thì người im lặng lâu nhất mà chưa tặng quà sẽ nhường chỗ. Góc trên bên trái overlay luôn có dòng mời **Bình luận để vào chánh điện** cho người vừa lướt vào.
 - **Bình luận đúng một từ** `nam`, `nữ`, `ông`, `bà`, `sư`, `ni`, `tiểu`, `cao tăng`: đổi hình nhân vật. Câu "Nam mô A Di Đà Phật" không bị hiểu nhầm thành "nam".
-- **Tặng quà**: banner xướng tên, giọng đọc hồi hướng (lấy lời nguyện từ bình luận gần nhất của người đó nếu có), hiệu ứng theo giá trị quà, cộng điểm vào bảng Công Đức.
-- **Thả tim**: tim bay trên đầu nhân vật.
+- **Tặng quà**: banner xướng tên, giọng đọc hồi hướng (lấy lời nguyện từ bình luận gần nhất của người đó nếu có), hiệu ứng theo giá trị quà, cộng điểm vào bảng Công Đức. Camera zoom vào người tặng, theo họ đi lên thảm đỏ, quỳ lạy ba lạy trước sư trụ trì, rồi lùi ra khi lễ vật bay tới tượng Phật. Mỗi lần zoom một người; tối đa hai người khác quỳ chờ tới lượt, quà lớn được zoom trước.
+- **Thả tim**: tim bay trên đầu nhân vật. Mỗi 1.000 tim (chỉnh được, hoặc tắt) thì mưa hoa sen khắp chánh điện, thỉnh chuông và cảm ơn đại chúng. Thanh tiến độ tới lần mưa hoa kế tiếp nằm dưới bộ đếm Thả tim.
+- **Bình luận "lời dạy"** (hay "xin lời Phật dạy"): nhận một lời Phật dạy ngắn trên banner kèm tên mình, đọc thành tiếng khi giọng đọc đang rảnh. Mỗi người 5 phút một lần; nhiều người hỏi thì 12 giây một lời.
+
+### Hoạt cảnh
+
+- **Kinh hành**: mỗi lần đọc kinh định kỳ, đoàn 8 vị sư và ni (cao tăng đi đầu) vào từ cột bên trái, đi xuống lối đi bên trái, vòng ra sau rồi đi lên lối bên phải và ra ở cột bên phải, mất khoảng nửa phút. Cả chánh điện cùng lạy, lần lượt từ hàng đầu xuống.
+- **Hồi hướng cuối khóa lễ**: hết giờ khóa lễ, giọng đọc hồi hướng công đức, đọc tên tối đa 12 người xem đang có mặt (người mới hoạt động gần đây trước), cả chánh điện cùng lạy. Người ở lại tới cuối được nghe tên mình.
+- **Cỡ người**: Phật tử vẽ to hơn khoảng cách chỗ ngồi (mặc định 120%) cho chánh điện trông đông đúc.
+
+Bảng điều khiển có nút **Kinh hành ngay**, **Thử mưa hoa sen** và **Hồi hướng ngay** để chủ động tạo cao trào hoặc thử trước khi live.
+
+Chánh điện không đứng yên: người ngồi lần lượt đứng dậy đi lạy rồi về chỗ. Người ở giữa đi theo thảm đỏ lên sau lưng sư trụ trì. Người hai bên đi theo hai lối đi bên (chạy theo phối cảnh từ cạnh thảm đỏ ra hai mép), lên lạy trước bục dưới hai cây đèn vàng. Mức **Người đi lại** trong bảng điều khiển chọn từ yên tĩnh tới rất nhộn nhịp (mặc định nhộn nhịp: tối đa 3 người trên thảm đỏ và 4 người ở hai bên cùng lúc). Mỗi người đi chỉ thay đổi một phần nhỏ khung hình nên hình live vẫn nét.
 
 Overlay có đồng hồ đếm ngược khóa lễ (mặc định 60 phút, hết giờ tự thỉnh chuông và đọc kinh), bộ đếm Dâng hương · Lễ Phật · Hoa sen · Thả tim, bảng giá lễ 1 / 5 / 10+ xu và bảng **Tấm Lòng Thành** top 3. Quà dưới 5 xu tính là Dâng hương, 5–9 xu là Lễ Phật, từ 10 xu là Hoa sen.
 
@@ -41,10 +52,10 @@ Dự án được viết để ai tải về chạy cũng an toàn mặc định
 
 - **Không dùng tài khoản TikTok.** Server chỉ đọc sự kiện công khai của phòng live theo username. Không cần, không hỏi và không lưu mật khẩu, cookie hay session. Không gửi tin nhắn thay bạn.
 - **Chỉ mở trên máy mình.** Server lắng nghe `127.0.0.1`, máy khác trong mạng hay Internet không truy cập được. Muốn mở ra ngoài phải tự đặt biến `HOST`. Không nên làm vậy khi chưa thêm đăng nhập.
-- **Chặn trang web lạ điều khiển.** WebSocket chỉ nhận kết nối từ chính trang của server (kiểm tra `Origin`), và header `Host` phải là localhost (chống DNS rebinding). Một trang web khác đang mở trong cùng trình duyệt không gửi được lệnh. Cửa sổ overlay chỉ nhận dữ liệu, không gửi lệnh được.
+- **Chặn trang web lạ điều khiển.** WebSocket chỉ nhận kết nối từ chính trang của server (kiểm tra `Origin`), và header `Host` phải là localhost (chống DNS rebinding). Một trang web khác đang mở trong cùng trình duyệt không gửi được lệnh. Cửa sổ overlay chỉ nhận dữ liệu và báo kích thước khung hình của nó, không gửi lệnh được.
 - **File tĩnh có danh sách trắng.** Chỉ phục vụ `/assets` và `/live`. Chặn file ẩn (`.git`, `.env`), `node_modules`, mã server, `package.json` và mọi đường dẫn `../`.
 - **Không tin dữ liệu vào.** Tên người xem, bình luận và tên quà đều bị cắt độ dài. Cài đặt chỉ nhận đúng khóa, đúng kiểu, trong giới hạn. Văn bản đưa vào giọng đọc được escape XML. Mọi chữ trên màn hình vẽ bằng `textContent` hoặc canvas, không chèn HTML, nên bình luận chứa mã độc chỉ hiện ra như chữ thường.
-- **Chống spam.** Hàng đợi giọng đọc tối đa 15 câu. Bình luận thường không đọc thành tiếng.
+- **Chống spam.** Hàng đợi giọng đọc tối đa 15 câu. Nội dung bình luận không bao giờ được đọc thành tiếng, chỉ tên người mới vào (đã lọc ký tự lạ) được gộp lại đọc, tối đa 30 giây một câu.
 - **Phụ thuộc ghim phiên bản** trong `live/package.json`: `ws`, `msedge-tts`, `tiktok-live-connector`. Không có khóa API nào trong mã.
 
 Các lớp trên đã được thử: đường dẫn `../`, `%2e%2e`, `.git/config`, `server.mjs`, `package.json` đều trả 404. Host giả trả 421. WebSocket từ Origin lạ bị từ chối. Lệnh gửi từ overlay bị bỏ qua. Cài đặt sai kiểu bị kẹp về giới hạn.
@@ -52,7 +63,8 @@ Các lớp trên đã được thử: đường dẫn `../`, `%2e%2e`, `.git/con
 ### Lưu ý
 
 - `tiktok-live-connector` là thư viện cộng đồng, không phải API chính thức của TikTok. Nó có thể ngừng chạy khi TikTok đổi hệ thống. Kiểm tra điều khoản TikTok trước khi dùng cho kênh của bạn.
-- Giọng đọc dùng dịch vụ Read Aloud của Microsoft Edge qua mạng (giọng Nam Minh, Hoài My). Máy phát cần có Internet.
+- Giọng đọc dùng dịch vụ Read Aloud của Microsoft Edge qua mạng (giọng Nam Minh, Hoài My). Máy phát cần có Internet. Dịch vụ này hay rớt kết nối: server tự gửi lại tối đa 8 lần (hết khoảng 13 giây nếu lần nào cũng lỗi), và nếu chờ quá 2,5 giây thì gửi thêm một yêu cầu song song, cái nào xong trước dùng cái đó. Câu kinh định kỳ được lưu lại để khỏi gọi mạng. Muốn không bao giờ bỏ câu, bật **giọng dự phòng của Windows** trong bảng điều khiển (giọng "Microsoft An" có sẵn trên Windows, nghe máy hơn).
+- TikTok LIVE Studio lấy tiếng của nguồn Link qua **âm thanh máy tính** (loa), nên mọi tiếng khác trên máy cũng lọt vào live. Khi live nên bật *Không làm phiền* của Windows, chọn *Power mode → Best performance*, để âm lượng âm thanh máy tính trong LIVE Studio không quá 100% và tắt micro nếu không nói.
 - Hình ảnh trong `assets/` được tạo bằng Google Flow (riêng ảnh nền overlay `grand_hall.jpg` tạo bằng Figma AI), nhạc nền tạo bằng Gemini. Kiểm tra điều khoản của các dịch vụ đó trước khi dùng thương mại, hoặc thay bằng tài nguyên của bạn.
 
 ## Miễn trừ trách nhiệm

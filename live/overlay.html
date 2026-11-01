@@ -15,48 +15,61 @@
 }
 html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--body);color:var(--fg)}
 #fit{position:fixed;inset:0;overflow:hidden}
+/* when the stage is shrunk (frame size < 100%) the margin shows the hall again, blurred and dimmed; it never moves */
+#backdrop{position:absolute;inset:-60px;background:#000 url(/assets/grand_hall.jpg) center/cover;filter:blur(22px) brightness(.45)}
 #stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center;overflow:hidden;background:var(--bg)}
 #c{position:absolute;inset:0;width:1080px;height:1920px}
 .ui{position:absolute;z-index:3}
 .panel{background:linear-gradient(180deg,rgba(48,21,8,.88),rgba(20,9,4,.88));border:2px solid var(--line);border-radius:20px;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 /* top-right: session countdown + offering counters (top-left belongs to TikTok's own header) */
-#offer{right:22px;top:250px;width:300px;box-sizing:border-box;padding:14px 18px 12px}
-#title{font-family:var(--display);font-weight:700;font-size:22px;color:var(--gold2);text-align:center;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#subtitle{font-family:var(--display);font-style:italic;font-size:18px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#clock{font:700 60px/1 var(--body);text-align:center;font-variant-numeric:tabular-nums;color:#fff4dc;margin:10px 0 2px;text-shadow:0 0 18px rgba(255,200,110,.35)}
-.lbl{font-size:17px;color:var(--muted);text-align:center;margin-bottom:8px;letter-spacing:.04em}
+#offer{right:20px;top:250px;width:340px;box-sizing:border-box;padding:14px 18px 12px}
+#title{font-family:var(--display);font-weight:700;font-size:25px;color:var(--gold2);text-align:center;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#subtitle{font-family:var(--display);font-style:italic;font-size:21px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#clock{font:700 76px/1 var(--body);text-align:center;font-variant-numeric:tabular-nums;color:#fff4dc;margin:10px 0 2px;text-shadow:0 0 18px rgba(255,200,110,.35)}
+.lbl{font-size:20px;color:var(--muted);text-align:center;margin-bottom:8px;letter-spacing:.04em}
 .cnt{display:flex;align-items:center;gap:12px;padding:5px 0;border-top:1px solid rgba(226,176,79,.22)}
-.cnt img,.cnt .ic{width:44px;height:44px;object-fit:contain;flex:none}
-.cnt .ic{display:grid;place-items:center;font-size:34px;line-height:1;color:#ff5a7a}
-.cnt b{font:700 30px var(--body);font-variant-numeric:tabular-nums;min-width:66px;color:var(--gold2)}
-.cnt span{font-size:21px;white-space:nowrap}
+.cnt img,.cnt .ic{width:54px;height:54px;object-fit:contain;flex:none}
+.cnt .ic{display:grid;place-items:center;font-size:42px;line-height:1;color:#ff5a7a}
+.cnt b{font:700 38px var(--body);font-variant-numeric:tabular-nums;min-width:84px;color:var(--gold2)}
+.cnt span{font-size:25px;white-space:nowrap}
 .cnt.bump b{animation:bump .6s}
 @keyframes bump{30%{transform:scale(1.3);color:#fff}}
-#people{margin-top:6px;padding-top:8px;border-top:1px solid rgba(226,176,79,.22);text-align:center;font-size:20px}
+/* likes goal: progress to the next lotus rain */
+#goal{padding:2px 0 6px}
+#goalBar{height:10px;margin:2px 4px 5px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+#goalBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a7a,#ffd98a);transition:width .6s}
+#goalText{display:block;font-size:20px;color:var(--muted);text-align:center;white-space:nowrap}
+#people{margin-top:6px;padding-top:8px;border-top:1px solid rgba(226,176,79,.22);text-align:center;font-size:24px}
 #people b{color:var(--gold2);font-variant-numeric:tabular-nums}
-/* bottom: latest offering, price legend, top donors */
-#bar{left:18px;right:18px;bottom:22px;height:206px;display:grid;grid-template-columns:1fr 330px;gap:14px}
-#left{display:grid;grid-template-rows:auto 1fr;gap:10px;min-width:0}
-#ticker{justify-self:center;max-width:100%;box-sizing:border-box;font:600 28px var(--body);padding:8px 28px;border-radius:999px;background:rgba(20,9,4,.84);border:2px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* bottom: latest offering, top donors */
+#bar{left:16px;right:16px;bottom:22px;height:240px;display:grid;grid-template-columns:1fr 370px;gap:14px}
+#left{align-self:end;display:grid;min-width:0}
+#ticker{justify-self:center;max-width:100%;box-sizing:border-box;font:600 34px var(--body);padding:8px 28px;border-radius:999px;background:rgba(20,9,4,.84);border:2px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ticker b{color:var(--gold2)}
 #ticker i{font-style:normal;color:var(--fg);margin-left:12px;opacity:.85}
 #ticker.flash{animation:flash 1.4s}
 @keyframes flash{30%{box-shadow:0 0 34px rgba(255,200,100,.85);border-color:var(--gold2)}}
-#legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.lg{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 10px}
-.lg img{width:60px;height:60px;object-fit:contain}
+/* top-left, level with the counters (TikTok's own header sits above): the price of each offering, see-through so the hall shows behind it */
+#legend{left:20px;top:250px;display:grid;gap:10px;opacity:.8}
+.lg{display:flex;align-items:center;gap:10px;padding:8px 18px 8px 10px;background:rgba(28,13,7,.55);box-shadow:none}
+.lg img{width:58px;height:58px;object-fit:contain}
 .lg div{display:grid;line-height:1.2}
-.lg small{font:700 18px var(--body);color:var(--gold2);letter-spacing:.05em}
-.lg span{font-size:22px;font-weight:600;white-space:nowrap}
+.lg small{font:700 21px var(--body);color:var(--gold2);letter-spacing:.05em}
+.lg span{font-size:26px;font-weight:600;white-space:nowrap}
+/* under the price list: what a passer-by can do for free, the reason to comment and stay; the second line changes every few seconds */
+#invite{left:20px;top:518px;max-width:600px;padding:10px 22px 12px 16px;display:grid;gap:3px;background:rgba(28,13,7,.62);box-shadow:none}
+#invite b{font:700 29px var(--body);color:var(--gold2);white-space:nowrap}
+#invite span{font-size:23px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .5s}
+#invite span.out{opacity:0}
 #board{padding:12px 16px}
-#board h3{margin:0 0 8px;text-align:center;font:700 24px var(--display);letter-spacing:.08em;color:var(--gold2)}
+#board h3{margin:0 0 8px;text-align:center;font:700 29px var(--display);letter-spacing:.08em;color:var(--gold2)}
 #board ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-#board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;font-size:24px;align-items:center}
+#board li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;font-size:29px;align-items:center}
 #board .r{font-weight:700;color:var(--gold2);text-align:center}
 #board li:first-child .n{color:var(--gold2);font-weight:600}
 #board .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #board .p{font-variant-numeric:tabular-nums;color:var(--gold2)}
-#board .empty{display:block;text-align:center;color:var(--muted);font-size:22px}
+#board .empty{display:block;text-align:center;color:var(--muted);font-size:26px}
 /* chant + gift banners float over the back rows, below the altar */
 #chant{left:110px;right:110px;top:900px;padding:20px 28px;text-align:center;border-radius:24px;border:2px solid var(--gold);
   background:rgba(40,18,8,.88);opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
@@ -65,8 +78,12 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 #chant p{margin:0;font-family:var(--display);font-style:italic;font-size:30px;line-height:1.45}
 #gift{left:80px;right:80px;top:900px;z-index:5;padding:26px 36px;text-align:center;border-radius:28px;border:3px solid var(--gold2);
   background:radial-gradient(ellipse at 50% 0%,rgba(150,40,20,.95),rgba(50,14,6,.95));box-shadow:0 0 60px rgba(255,190,90,.45);
-  opacity:0;transform:scale(.85);transition:opacity .45s,transform .45s cubic-bezier(.2,1.4,.4,1)}
+  opacity:0;transform:scale(.85);transition:opacity .45s,transform .45s cubic-bezier(.2,1.4,.4,1),top .6s}
 #gift.show{opacity:1;transform:none}
+/* during a close-up on a giver the gift banner gets out of the shot: compact, just above the bottom bar */
+#stage.closeup #gift{top:1460px;padding:14px 28px}
+#stage.closeup #gift .who{font-size:40px}
+#stage.closeup #gift .pray{margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #gift .who{font-family:var(--display);font-weight:700;font-size:50px;color:var(--gold2)}
 #gift .what{font-size:34px;margin-top:6px}
 #gift .pray{font-family:var(--display);font-style:italic;font-size:30px;color:var(--fg);margin-top:12px;opacity:.95}
@@ -77,7 +94,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 </style>
 </head>
 <body>
-<div id="fit"><div id="stage">
+<div id="fit"><div id="backdrop"></div><div id="stage">
   <canvas id="c" width="1080" height="1920"></canvas>
   <div id="offer" class="panel ui">
     <div id="title">Chánh Điện Tịnh Tâm</div>
@@ -88,20 +105,22 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
     <div class="cnt" id="c_bow"><img src="/assets/fx_halo.png" alt=""><b>0</b><span>Lễ Phật</span></div>
     <div class="cnt" id="c_lotus"><img src="/assets/fx_lotus.png" alt=""><b>0</b><span>Hoa sen</span></div>
     <div class="cnt" id="c_likes"><span class="ic">♥</span><b>0</b><span>Thả tim</span></div>
+    <div id="goal" hidden><div id="goalBar"><i></i></div><span id="goalText"></span></div>
     <div id="people"><b id="count">0</b> người đang lễ</div>
   </div>
   <div id="bar" class="ui">
     <div id="left">
       <div id="ticker"><b id="tkName">Nam Mô A Di Đà Phật</b><i id="tkWhat">tùy hỷ công đức</i></div>
-      <div id="legend">
-        <div class="lg panel"><img src="/assets/fx_incense.png" alt=""><div><small>1 COIN</small><span>Dâng hương</span></div></div>
-        <div class="lg panel"><img src="/assets/fx_halo.png" alt=""><div><small>5 COINS</small><span>Lễ Phật</span></div></div>
-        <div class="lg panel"><img src="/assets/fx_lotus.png" alt=""><div><small>10+ COINS</small><span>Hoa sen</span></div></div>
-      </div>
     </div>
     <div id="board" class="panel"><h3>TẤM LÒNG THÀNH</h3><ol id="boardList"><li class="empty">Chưa có</li></ol></div>
   </div>
-  <div id="chant" class="ui"><h4>✦ TỤNG KINH ĐỊNH KỲ ✦</h4><p id="chantText"></p></div>
+  <div id="legend" class="ui">
+    <div class="lg panel"><img src="/assets/fx_incense.png" alt=""><div><small>1 COIN</small><span>Dâng hương</span></div></div>
+    <div class="lg panel"><img src="/assets/fx_halo.png" alt=""><div><small>5 COINS</small><span>Lễ Phật</span></div></div>
+    <div class="lg panel"><img src="/assets/fx_lotus.png" alt=""><div><small>10+ COINS</small><span>Hoa sen</span></div></div>
+  </div>
+  <div id="invite" class="panel ui"><b>💬 Bình luận để vào chánh điện</b><span id="inviteTip">Bạn sẽ ngồi ngay trên bồ đoàn</span></div>
+  <div id="chant" class="ui"><h4 id="chantHead">✦ TỤNG KINH ĐỊNH KỲ ✦</h4><p id="chantText"></p></div>
   <div id="gift" class="ui"><div class="who" id="giftWho"></div><div class="what" id="giftWhat"></div><div class="pray" id="giftPray"></div></div>
   <button id="unmute">🔔 Bấm để bật âm thanh</button>
   <div id="conn">đang kết nối…</div>
@@ -110,7 +129,9 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 <script>
 /* ======================= stage fit ======================= */
 const stage = document.getElementById('stage');
-function fit(){ const s = Math.min(innerWidth/1080, innerHeight/1920); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
+let FRAME_K = .9;            // frame size setting: phones crop the sides of a LIVE, so the stage can leave a margin
+const stageScale = () => Math.min(innerWidth/1080, innerHeight/1920) * FRAME_K;
+function fit(){ stage.style.transform = `translate(-50%,-50%) scale(${stageScale()})`; }
 addEventListener('resize', fit); fit();
 const $ = id => document.getElementById(id);
 
@@ -128,6 +149,7 @@ function avatar(url){ if(!url) return null; let im=avatars.get(url); if(!im){ im
 // everyone while walking, is painted once per outfit into offscreen canvases, then scaled per seat.
 const KNEEL_IMG = { man:'k_man', woman:'k_woman', grandpa:'k_grandpa', granny:'k_granny' };
 const KNEEL_H = 92;                                   // px height of a kneeling sprite at depth 1
+let PEOPLE_K = 1.2;                                   // "cỡ người" setting: worshippers drawn larger than their seat spacing, so the hall reads full
 const SKINS = {
   man:    { robe:'#b9c2e2', dark:'#7c87ad', hair:'#2b211d' },
   woman:  { robe:'#d8c6e8', dark:'#9a85b2', hair:'#2b211d', bun:true },
@@ -191,13 +213,18 @@ const VP = 376;
 const depth = y => (y-VP)/1000;                       // 1 ≈ size of the front rows
 const carpetHalf = y => .1936*(y-VP);
 const UNIT = .66;                                     // sprite unit → px at depth 1
+// Every column of seats lies on a line to the vanishing point, so leaving out one column on each side opens two side aisles
+// that follow the perspective, from beside the carpet at the front row out to the edges at the bottom. 230 places minus
+// those two columns leaves exactly the 200 the server seats.
+const AISLE_COL = 3;
+const sideAisle = y => carpetHalf(y) + 64*depth(y)*(.62+AISLE_COL);   // distance of a side aisle from the middle at y
 const SEATS = [];
 (function buildSeats(){
   let y = 900, r = 0;
   while (y <= 1690){
     const k = depth(y), cg = 64*k, xin = 540 + carpetHalf(y) + .62*cg, xout = (y < 935 ? 955 : 1062) - .5*cg;   // pillars stand in the back corners
     const n = Math.floor((xout-xin)/cg) + 1;
-    for (let i=0;i<n;i++) for (const side of [-1,1]) SEATS.push({ x: 540 + side*(xin-540+i*cg), y, k, r, i });
+    for (let i=0;i<n;i++) if (i !== AISLE_COL) for (const side of [-1,1]) SEATS.push({ x: 540 + side*(xin-540+i*cg), y, k, r, i });
     r++; y += 54*k;
   }
   // fill outward from the middle of the floor, carpet side first, so a small crowd still reads as a full hall
@@ -214,14 +241,14 @@ function addVisitor(p, instant){
   if (old){ Object.assign(old, { name:p.name, skin:p.skin, avatar:p.avatar, coins:p.coins }); return; }
   const si = taken.indexOf(null), seat = si >= 0 ? SEATS[si] : null;
   if (seat) taken[si] = p.id;
-  const walking = [...visitors.values()].filter(v => v.state==='walk').length;
+  const walking = [...visitors.values()].filter(v => v.state==='walk' && !v.visit).length;
   const lane = Math.random()-.5;
   const v = { ...p, seat, state:'walk', x:540+lane*carpetHalf(1990)*.6, y:1990, lane, ft:0, step:0, fade:1, sitT:1,
               glow:0, bow:0, bubble:null, active: instant ? -1e9 : performance.now(), phase:Math.random()*6.28 };   // a newcomer's name shows for a while
   visitors.set(p.id, v);
   if (instant || !seat || walking > 10){ v.state='sit'; v.x=seat?.x ?? 540; v.y=seat?.y ?? 1500; v.fade=instant?1:0; }
 }
-function removeVisitor(id){ const v=visitors.get(id); if (!v) return; endOffering(v); if (v.seat) taken[v.seat.idx]=null; visitors.delete(id); }
+function removeVisitor(id){ const v=visitors.get(id); if (!v) return; endOffering(v); endVisit(v); if (v.seat) taken[v.seat.idx]=null; visitors.delete(id); }
 
 /* the abbot (painted sprite, larger than life so he reads on a phone) kneels at the head of the carpet, two teachers just behind him */
 const TEACHERS = [ { name:'Thầy Minh Đạo', skin:'monk', x:458, y:858 }, { name:'Thầy Tâm Từ', skin:'monk', x:622, y:858 } ];
@@ -271,6 +298,16 @@ setInterval(() => {
   const s = Math.max(0, Math.round((sessionEndsAt-Date.now())/1000)), p = x => String(Math.floor(x)).padStart(2,'0');
   $('clock').textContent = s >= 3600 ? `${Math.floor(s/3600)}:${p(s/60%60)}:${p(s%60)}` : `${p(s/60)}:${p(s%60)}`;
 }, 500);
+const inviteTips = () => [settings.greet ? 'Được ngồi bồ đoàn và xướng tên chào đón' : 'Bạn sẽ ngồi ngay trên bồ đoàn',
+  ...(settings.teach !== false ? ['Gõ “lời dạy” để nhận một lời Phật dạy'] : []),
+  settings.likeStep && likeGoal ? `Đủ ${fmt(likeGoal)} tim: mưa hoa sen khắp chánh điện` : 'Thả tim để tim bay trên đầu bạn',
+  ...(settings.dedicate !== false ? ['Cuối khóa lễ hồi hướng, đọc tên người có mặt'] : []),
+  'Gõ nam · nữ · ông · bà · sư · ni để đổi hình'];
+let inviteIdx = 0;
+setInterval(() => {
+  const el = $('inviteTip'); el.classList.add('out');
+  setTimeout(() => { const tips = inviteTips(); el.textContent = tips[++inviteIdx % tips.length]; el.classList.remove('out'); }, 500);
+}, 6000);
 let giftHide=null;
 function showGift(m){
   $('giftWho').textContent = m.name;
@@ -280,7 +317,15 @@ function showGift(m){
   const el=$('gift'); el.classList.add('show'); clearTimeout(giftHide); giftHide=setTimeout(()=>el.classList.remove('show'), m.tier>=3?9000:6500);
 }
 let chantHide=null;
-function showChant(text){ $('chantText').textContent=text; const el=$('chant'); el.classList.add('show'); clearTimeout(chantHide); chantHide=setTimeout(()=>el.classList.remove('show'), 14000); }
+// the same banner carries the periodic chant, a teaching asked for in a comment, the dedication and a likes goal
+function showChant(text, head='✦ TỤNG KINH ĐỊNH KỲ ✦', ms=14000){ $('chantHead').textContent=head; $('chantText').textContent=text; const el=$('chant'); el.classList.add('show'); clearTimeout(chantHide); chantHide=setTimeout(()=>el.classList.remove('show'), ms); }
+let likeGoal=0, likesNow=0;
+function setGoal(likes, goal){
+  if (goal!==undefined) likeGoal=goal; if (likes!==undefined) likesNow=likes; likes=likesNow; const step=settings.likeStep||0, el=$('goal');
+  el.hidden=!(step && likeGoal); if (el.hidden) return;
+  $('goalBar').firstElementChild.style.width = Math.max(0, Math.min(100, (likes-(likeGoal-step))/step*100)) + '%';
+  $('goalText').textContent = `Đủ ${fmt(likeGoal)} tim: mưa hoa sen`;
+}
 
 /* ======================= audio ======================= */
 let AC=null, master=null, musicGain=null, sfx=null, settings={ music:true, mo:true, moBpm:52 };
@@ -288,11 +333,15 @@ const TRACKS=['/assets/music/music1.mp3','/assets/music/music2.mp3']; let trackI
 $('unmute').onclick = e => { e.currentTarget.remove(); startAudio(); };
 // Browser sources inside streaming apps (TikTok LIVE Studio "Link", OBS) usually allow sound without a click, and there is
 // no way to click them anyway: start straight away there. A normal Chrome window starts suspended and keeps the button.
-setTimeout(() => { try { const probe = new (window.AudioContext||window.webkitAudioContext)(), ok = probe.state === 'running'; probe.close();
-  if (ok && $('unmute')){ $('unmute').remove(); startAudio(); } } catch {} }, 0);
+const AUTO_SOUND = (() => { try { const probe = new (window.AudioContext||window.webkitAudioContext)(), ok = probe.state === 'running'; probe.close(); return ok; } catch { return false; } })();
+setTimeout(() => { if (AUTO_SOUND && $('unmute')){ $('unmute').remove(); startAudio(); } }, 0);
+let voiceOn = true;          // the server lets one overlay play sound, the others stay silent (two would echo)
+function setVoice(on){ voiceOn = on; if (master) master.gain.value = on ? .9 : 0; }
 function startAudio(){
+  // Default latency on purpose: the Link source in TikTok LIVE Studio went silent during a live while this asked for
+  // { latencyHint: 'playback' }, the only audio change at the time. Sound came back once it was gone.
   AC = new (window.AudioContext||window.webkitAudioContext)();
-  master = AC.createGain(); master.gain.value=.9; master.connect(AC.destination);
+  master = AC.createGain(); master.gain.value = voiceOn ? .9 : 0; master.connect(AC.destination);
   musicGain = AC.createGain(); musicGain.gain.value=settings.music?.5:0; musicGain.connect(master);
   sfx = AC.createGain(); sfx.gain.value=1; sfx.connect(master);
   nextTrack(); scheduleMo(); bell();
@@ -316,14 +365,17 @@ function mo(){
   o.connect(bp); bp.connect(g); g.connect(sfx); o.start(t); o.stop(t+.16);
 }
 let moTimer=null; function scheduleMo(){ clearInterval(moTimer); if (AC && settings.mo) moTimer=setInterval(mo, 60000/Math.max(20,settings.moBpm||52)); }
-// server-made voice lines play one after another
+// server-made voice lines play one after another. Each is downloaded (as soon as it arrives) and decoded in full, then
+// played from memory on the audio thread: a media element decodes while it plays and stalls when the page is busy drawing.
 const ttsQ=[]; let ttsPlaying=false;
-function queueTTS(url, onStart){ ttsQ.push({url,onStart}); playTTS(); }
-function playTTS(){
+function queueTTS(url){ ttsQ.push(fetch(url).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null)); playTTS(); }
+async function playTTS(){
   if (ttsPlaying || !ttsQ.length || !AC) return; ttsPlaying=true;
-  const {url,onStart}=ttsQ.shift(); const el=new Audio(url); const src=AC.createMediaElementSource(el); const g=AC.createGain(); g.gain.value=1.25; src.connect(g); g.connect(master);
-  el.onplay=()=>{ duck(true); onStart&&onStart(); }; el.onended=el.onerror=()=>{ duck(false); ttsPlaying=false; setTimeout(playTTS,350); };
-  el.play().catch(()=>{ ttsPlaying=false; });
+  let buf=null; try { buf = await AC.decodeAudioData(await ttsQ.shift()); } catch {}
+  if (!buf){ ttsPlaying=false; playTTS(); return; }
+  const src=AC.createBufferSource(); src.buffer=buf; const g=AC.createGain(); g.gain.value=1.25; src.connect(g); g.connect(master);
+  src.onended=()=>{ duck(false); ttsPlaying=false; setTimeout(playTTS,350); };
+  duck(true); src.start(AC.currentTime+.05);
 }
 
 /* ======================= effects ======================= */
@@ -343,61 +395,178 @@ function giftFx(v, tier, kind){
   fx.push({ kind: FX_ICON[kind] || 'incense', x:v.x, y:v.y-110*UNIT*k, t:0, life: tier>=3?3.4:2.4, scale: k*(tier>=3?.75:.55) });
 }
 
-/* offering procession: the giver walks up the carpet, kneels before the abbot, bows three times while the offering
-   floats up to the Buddha, then goes on to their (donor) seat */
+/* offering procession: the giver bows at their seat, walks up the carpet, kneels before the abbot, bows three times
+   while the offering floats up to the Buddha, then goes on to their (donor) seat */
 const OFFER_SPOTS = [ {x:540,y:955}, {x:488,y:962}, {x:592,y:962}, {x:540,y:1004}, {x:482,y:1012}, {x:598,y:1012} ];
 const spotBusy = new Array(OFFER_SPOTS.length).fill(null);
 function startOffering(v, tier, kind){
   if (!v?.seat) return false;
-  if (v.offer){ v.offer.tier=Math.max(v.offer.tier,tier); v.offer.kind=kind; if (v.state==='offer'){ v.offer.t=Math.min(v.offer.t,.3); v.offer.flown=false; } return true; }   // a combo: bow and offer again
+  if (v.offer){ v.offer.tier=Math.max(v.offer.tier,tier); v.offer.kind=kind; if (v.state==='offer'){ v.offer.t=Math.min(v.offer.t,.3); v.offer.flown=false; } focusGiver(v.id, v.offer.tier); return true; }   // a combo: bow and offer again
   const si=spotBusy.indexOf(null); if (si<0) return false;
-  spotBusy[si]=v.id; v.offer={ spot:si, tier, kind, t:0, flown:false }; v.dest=OFFER_SPOTS[si];
-  if (v.state==='sit') v.state='walk';
+  if (v.visit){ endVisit(v); if (v.state==='visit') v.state='sit'; }   // was out bowing: bows where they are, then on to the altar
+  spotBusy[si]=v.id; v.dest=OFFER_SPOTS[si];
+  v.offer={ spot:si, tier, kind, t:0, flown:false, hold: v.state==='sit' ? 1.2 : 0 };   // kneels a moment longer while the camera moves in
+  if (v.state==='sit') v.bow=1;
   v.lane=Math.max(-.9, Math.min(.9, (v.dest.x-540)/(carpetHalf(v.dest.y)*.6) + (si>=3 ? .25 : 0)));   // each spot has its own lane up the carpet
+  focusGiver(v.id, tier);
   return true;
 }
 function endOffering(v){ if (!v.offer) return; spotBusy[v.offer.spot]=null; v.offer=null; v.dest=null; }
+
+/* the hall is never quite still: every second or two someone gets up and goes to bow, then back to their seat. Some walk up
+   the carpet and kneel behind the offering spots; people on either side take their side aisle up to the front of the
+   floor, under the golden lantern stands. How many walk at once follows the "người đi lại" setting and the size of the
+   crowd; nobody starts while the camera is in close on a giver. A walker changes only a small part of the picture,
+   unlike flicker over the whole hall, so the stream stays sharp. */
+const VISIT_SPOTS = [ {x:470,y:1065}, {x:540,y:1065}, {x:610,y:1065}, {x:455,y:1120}, {x:540,y:1120}, {x:625,y:1120}, {x:470,y:1172}, {x:610,y:1172} ];
+const SIDE_SPOTS = [260, 335, 405].flatMap(d => [-1, 1].map(side => ({ x:540+side*d, y:838, side })));   // in front of the platform, clear of the first row
+const visitBusy = new Array(VISIT_SPOTS.length).fill(null), sideBusy = new Array(SIDE_SPOTS.length).fill(null);
+const CARPET_MAX = [0, 1, 3, 5], SIDE_MAX = [0, 2, 4, 6];   // walkers at a time for settings.bustle 0..3
+let bustleT = 2;
+const pathX = (v, y) => v.side ? 540+v.side*sideAisle(y) : 540+v.lane*carpetHalf(y)*.6;   // the line a walker follows up and down the hall
+function endVisit(v){
+  if (!v.visit) return; const busy = v.visit.side ? sideBusy : visitBusy;
+  if (busy[v.visit.si]===v.id) busy[v.visit.si]=null; v.visit=null; v.side=0;
+}
+function bustle(dt){
+  if ((bustleT-=dt) > 0) return; bustleT = .8+Math.random()*1.8;
+  const all=[...visitors.values()], lvl=settings.bustle ?? 2, out=all.filter(v => v.visit);
+  if (cam.id || out.length >= Math.floor(all.length/5)) return;
+  const sideOk = !procession.length && out.filter(v => v.visit.side).length < SIDE_MAX[lvl], carpetOk = out.filter(v => !v.visit.side).length < CARPET_MAX[lvl];
+  if (!sideOk && !carpetOk) return;
+  const side = sideOk && (!carpetOk || Math.random() < .6), spots = side ? SIDE_SPOTS : VISIT_SPOTS, busy = side ? sideBusy : visitBusy;
+  const free = spots.map((s,i) => i).filter(i => busy[i]===null); if (!free.length) return;
+  const si = free[Math.floor(Math.random()*free.length)], spot = spots[si];
+  const idle = all.filter(v => v.state==='sit' && !v.offer && v.seat && v.fade>=1 && !camWaiting(v.id) && (!side || Math.sign(v.seat.x-540)===spot.side));
+  if (!idle.length) return;
+  const v = idle[Math.floor(Math.random()*idle.length)];
+  busy[si]=v.id; v.visit={ si, spot, side:side ? spot.side : 0, t:0, hold:2.6+Math.random()*1.4, back:false };
+  v.state='walk'; v.side=v.visit.side;
+  if (!side) v.lane=Math.max(-.9, Math.min(.9, (spot.x-540)/(carpetHalf(spot.y)*.6)));
+  if (!v.demo) v.active=performance.now();                       // a real viewer's name shows while they walk
+}
+
+/* kinh hành: a file of monks and nuns, the master in front, comes in by the left pillar, walks down the left aisle and out
+   of the picture at the bottom, comes back in at the bottom right (round behind the camera), goes up the right aisle and
+   out by the right pillar. It starts with each periodic chant (or from the panel) and takes about half a minute. */
+const PROC_PATH = [ {x:135,y:838}, {aisle:-1,y:845}, {aisle:-1,y:1790}, {aisle:1,y:1790,jump:true}, {aisle:1,y:845}, {x:945,y:838} ];
+const PROC_SKINS = ['master','monk','nun','monk','nun','child','monk','nun'];
+const procession = [];
+const procPt = p => p.aisle ? { x:540+p.aisle*sideAisle(p.y), y:p.y } : p;
+function startProcession(){
+  if (procession.length) return;
+  PROC_SKINS.forEach((skin,i) => procession.push({ proc:true, skin, wait:i*1.3, seg:1, ...procPt(PROC_PATH[0]), fade:0, wp:0, ft:0, step:0 }));
+}
+function stepProcession(dt){
+  for (let i=procession.length-1;i>=0;i--){ const m=procession[i];
+    if ((m.wait-=dt) > 0) continue;
+    const p=PROC_PATH[m.seg];
+    if (!p){ m.fade-=dt*1.5; if (m.fade<=0) procession.splice(i,1); continue; }   // gone by the right pillar
+    m.fade=Math.min(1,m.fade+dt*1.5);
+    const to=procPt(p); if (p.jump){ m.x=to.x; m.y=to.y; m.seg++; continue; }
+    const dx=to.x-m.x, dy=to.y-m.y, dist=Math.hypot(dx,dy), sp=150*depth(m.y)*dt;
+    if (dist<=sp){ m.x=to.x; m.y=to.y; m.seg++; } else { m.x+=dx/dist*sp; m.y+=dy/dist*sp; }
+    m.wp+=dt*7; m.ft+=dt; if (m.ft>.25){ m.ft=0; m.step^=1; }
+  }
+}
+// the whole hall bows together, row after row from the front, at a chant and at the dedication that ends a session
+function bowWave(){ const now=performance.now(); for (const v of visitors.values()) if (v.seat) v.bowAt=now+v.seat.r*110+Math.random()*150; }
+// a likes goal reached: lotus petals rain over the whole hall, the halo flares and the big bell rings
+function lotusRain(){
+  blessing(3); bell(true);
+  for (let i=0;i<70;i++) petals.push({ x:Math.random()*1080, y:-40-Math.random()*500, vx:(Math.random()-.5)*50, vy:110+Math.random()*90, t:0, life:7+Math.random()*3, s:.16+Math.random()*.14 });
+}
+
+/* camera: a gift moves in on the giver at their seat, follows them up the carpet and through the three bows, then pulls
+   back out as the offering reaches the Buddha so the halo rays show. One giver at a time; two more stay kneeling at their
+   seats until their turn, bigger gifts first (anyone else still makes their offering, just without the close-up).
+   Between close-ups the view is exactly 1:1. */
+const CAM_AX=540, CAM_AY=1150, CAM_Z=2.3;   // the followed person's feet sit here on screen, the abbot and altar above them
+const cam = { x:CAM_AX, y:CAM_AY, z:1, id:null, t:0, rest:0, q:[] };
+const camWaiting = id => cam.q.some(e => e.id===id);
+function focusGiver(id, tier){
+  if (cam.id===id || camWaiting(id)) return;
+  if (cam.q.length>=2){ if (tier<=cam.q[cam.q.length-1].tier) return; cam.q.pop(); }   // a bigger gift takes the last place in line
+  cam.q.push({ id, tier }); cam.q.sort((a,b) => b.tier-a.tier);
+}
+function camStep(dt){
+  let v = cam.id ? visitors.get(cam.id) : null;
+  if (cam.id && (!v?.offer || (v.state==='offer' && v.offer.t>2.5) || (cam.t+=dt)>16)){ cam.id=null; cam.rest=1.4; v=null; }   // offering has reached the Buddha: pull back
+  if (!cam.id && (cam.rest-=dt)<=0) while (cam.q.length){
+    const n=visitors.get(cam.q.shift().id);
+    if (n?.offer && !(n.state==='offer' && n.offer.t>2)){ cam.id=n.id; cam.t=0; v=n; if (n.state==='sit') n.bow=1; break; }   // skip those nearly done by now
+  }
+  const ez = 1-Math.exp(-dt*2.6), ep = 1-Math.exp(-dt*4);
+  cam.z += ((v ? CAM_Z : 1)-cam.z)*ez; cam.x += ((v ? v.x : CAM_AX)-cam.x)*ep; cam.y += ((v ? v.y : CAM_AY)-cam.y)*ep;
+  if (!v && Math.abs(cam.z-1)<.003){ cam.z=1; cam.x=CAM_AX; cam.y=CAM_AY; return; }
+  cam.x = Math.max(CAM_AX/cam.z, Math.min(1080-(1080-CAM_AX)/cam.z, cam.x));   // never past the edges of the painting
+  cam.y = Math.max(CAM_AY/cam.z, Math.min(1920-(1920-CAM_AY)/cam.z, cam.y));
+}
 function hearts(v,n){ if (!v) return; const k=v.seat?.k || .8; for (let i=0;i<Math.min(6,n);i++) petals.push({x:v.x+(Math.random()-.5)*50*k, y:v.y-100*UNIT*k, vx:(Math.random()-.5)*20, vy:-(50+Math.random()*40), t:0, life:1.6, s:.08, heart:true, size:Math.max(18,34*k)}); }
 
 /* ======================= server link ======================= */
 let ws=null;
+// the panel shows the pixel size this page renders at, so a Link source left at its default size is caught
+function sendSize(){ if (ws?.readyState===1) ws.send(JSON.stringify({ t:'size', w:innerWidth, h:innerHeight, d:devicePixelRatio||1 })); }
+addEventListener('resize', sendSize);
 function connect(){
-  ws = new WebSocket(`ws://${location.host}/ws?role=overlay`);
+  ws = new WebSocket(`ws://${location.host}/ws?role=overlay&sound=${AUTO_SOUND ? 'auto' : 'click'}`);
   const st=$('conn');
-  ws.onopen=()=>{ st.textContent=''; };
+  ws.onopen=()=>{ st.textContent=''; sendSize(); };
   ws.onclose=()=>{ st.textContent='mất kết nối server… đang thử lại'; setTimeout(connect,2000); };
   ws.onmessage=e=>{
     const m=JSON.parse(e.data), now=performance.now();
     switch(m.t){
       case 'state':
         Object.assign(settings,m.settings); applySettings(); if (m.sessionEndsAt) sessionEndsAt=m.sessionEndsAt;
-        visitors.clear(); taken.fill(null); spotBusy.fill(null); for (const p of m.viewers) addVisitor(p,true); arrange(true);
-        updateCount(); setStats(m.stats); setTop(m.top); setTicker(m.lastOffer); break;
+        visitors.clear(); taken.fill(null); spotBusy.fill(null); visitBusy.fill(null); sideBusy.fill(null); for (const p of m.viewers) addVisitor(p,true); arrange(true);
+        updateCount(); setStats(m.stats); setGoal(m.stats?.likes, m.likeGoal); setTop(m.top); setTicker(m.lastOffer); break;
       case 'settings': Object.assign(settings,m.settings); applySettings(); break;
       case 'join': addVisitor(m.v, m.v.demo && visitors.size>8); if (m.v.coins>0) arrange(); updateCount(); break;
       case 'leave': { const was=visitors.get(m.id)?.coins>0; removeVisitor(m.id); if (was) arrange(); updateCount(); } break;
       case 'skin': { const v=visitors.get(m.id); if(v){ v.skin=m.skin; v.glow=.8; v.active=now; } } break;
       case 'chat': { const v=visitors.get(m.id); if(v){ v.bubble={text:m.text, at:now, until:now+6000}; v.bow=.6; v.active=now; } } break;
       case 'gift': { const v=visitors.get(m.id); if(v) v.coins=m.total; giftFx(v,m.tier,m.kind); arrange(); setStats(m.stats,true); setTop(m.top); setTicker({name:m.name,label:m.label},true); showGift(m); } break;
-      case 'stats': setStats(m.stats,true); break;
+      case 'stats': setStats(m.stats,true); setGoal(m.stats?.likes, m.likeGoal); break;
       case 'session': sessionEndsAt=m.endsAt; break;
       case 'like': hearts(visitors.get(m.id),m.n); break;
       case 'tts': queueTTS(m.url); break;
-      case 'chant': showChant(m.text); bell(); break;
+      case 'chant': showChant(m.text); bell(); bowWave(); if (settings.procession !== false) startProcession(); break;
+      case 'procession': startProcession(); break;
+      case 'likegoal': lotusRain(); setGoal(undefined, m.next); showChant('Cảm ơn đại chúng đã thả tim. Nguyện hoa sen nở khắp mười phương, ai nấy thân tâm an lạc.', `✦ ĐỦ ${fmt(m.goal)} TIM · MƯA HOA SEN ✦`, 9000); break;
+      case 'teach': { const v=visitors.get(m.id); if (v){ v.glow=1; v.bow=1; v.active=now; } showChant(m.text, `✦ LỜI PHẬT DẠY · ${m.name} ✦`, 12000); } break;
+      case 'dedicate': showChant(m.names.join(', ') + (m.more ? ` cùng ${m.more} Phật tử khác` : ''), '✦ HỒI HƯỚNG CÔNG ĐỨC ✦', 16000); bowWave();
+        for (const v of visitors.values()) if (!v.demo) v.glow=.8; break;
       case 'bell': bell(true); rays=Math.max(rays,.5); break;
       case 'mo1': mo(); break;
+      case 'voice': setVoice(m.on); break;
     }
   };
 }
 function applySettings(){
   $('title').textContent=settings.title||'Chánh Điện Tịnh Tâm';
   $('subtitle').textContent=settings.subtitle||'Nam Mô A Di Đà Phật';
+  const fk=(settings.frameSize||100)/100; if (fk!==FRAME_K){ FRAME_K=fk; fit(); sizeCanvas(); }
+  PEOPLE_K=(settings.peopleSize||120)/100; setGoal();
+  { const tips=inviteTips(); $('inviteTip').textContent = tips[inviteIdx % tips.length]; }
   duck(false); scheduleMo();
 }
 connect();
 
 /* ======================= render ======================= */
 const ctx=$('c').getContext('2d'); ctx.imageSmoothingQuality='high';   // painted sprites are scaled down a lot
+// The canvas backing store follows the real device pixels the stage ends up on (window scale × Windows display scaling),
+// so a capture never upscales a 1080-wide bitmap. Drawing code keeps working in 1080×1920 stage units.
+// A browser source inside the streaming app (AUTO_SOUND) ends up in a 1080×1920, 30 fps stream whatever its own size:
+// there it draws at most 1080×1920 and 30 times a second. More only costs CPU, and a CPU short of time makes the voice stutter.
+let RES_K = 1;
+const MAX_RES_K = AUTO_SOUND ? 1 : 2, FRAME_MS = AUTO_SOUND ? 1000/30 : 0;
+function sizeCanvas(){
+  const k = Math.min(MAX_RES_K, Math.max(1, Math.round(stageScale()*(devicePixelRatio||1)*100)/100));
+  if (k === RES_K) return;
+  RES_K = k; const c = $('c'); c.width = Math.round(1080*k); c.height = Math.round(1920*k); ctx.imageSmoothingQuality = 'high';
+}
+addEventListener('resize', sizeCanvas); sizeCanvas();
 function sprite(im,x,y,s,ay=1){ if(!im?.naturalWidth) return; const w=im.naturalWidth*s,h=im.naturalHeight*s; ctx.drawImage(im,x-w/2,y-h*ay,w,h); }
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function tag(text,x,y,fs,gold,av){
@@ -410,11 +579,11 @@ function tag(text,x,y,fs,gold,av){
   ctx.fillStyle = gold?'#ffd98a':'#f6e9cf'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t, x+aw/2, y+1);
 }
 function bubble(text,x,y,placed){
-  const fs=30; ctx.font=`700 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
-  const lines=[]; let cur='';                                   // wrap to two lines of at most 400px
-  for (const w of String(text).split(/\s+/)){ const n=cur?cur+' '+w:w; if (ctx.measureText(n).width>400 && cur){ lines.push(cur); cur=w; } else cur=n; if (lines.length===2) break; }
+  const fs=38; ctx.font=`700 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
+  const lines=[]; let cur='';                                   // wrap to two lines of at most 470px
+  for (const w of String(text).split(/\s+/)){ const n=cur?cur+' '+w:w; if (ctx.measureText(n).width>470 && cur){ lines.push(cur); cur=w; } else cur=n; if (lines.length===2) break; }
   if (lines.length<2 && cur) lines.push(cur);
-  if (lines.length===2 && ctx.measureText(lines[1]).width>400){ let s=lines[1]; while (s.length>2 && ctx.measureText(s+'…').width>400) s=s.slice(0,-1); lines[1]=s+'…'; }
+  if (lines.length===2 && ctx.measureText(lines[1]).width>470){ let s=lines[1]; while (s.length>2 && ctx.measureText(s+'…').width>470) s=s.slice(0,-1); lines[1]=s+'…'; }
   const w=Math.max(...lines.map(l=>ctx.measureText(l).width))+fs*1.1, lh=fs*1.25, h=lh*lines.length+fs*.6;
   const bx=Math.max(16, Math.min(1064-w, x-w/2)); let by=y-h-12, tail=true;
   for (let moved=true, n=0; moved && n<8; n++){ moved=false;          // newer bubbles step up over older ones instead of covering them
@@ -454,12 +623,16 @@ function glow(x,y,r,a){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.
 const smoke = Array.from({length:18}, (_,i) => i/18);
 let last=performance.now();
 function frame(now){
-  requestAnimationFrame(frame); const dt=Math.max(0,Math.min((now-last)/1000,.05)); last=Math.max(last,now); const t=now/1000;
-  ctx.clearRect(0,0,1080,1920);
+  const dt=Math.max(0,Math.min((now-last)/1000,.05)); last=Math.max(last,now); const t=now/1000;
+  ctx.setTransform(RES_K,0,0,RES_K,0,0); ctx.clearRect(0,0,1080,1920);
+  camStep(dt); bustle(dt); stage.classList.toggle('closeup', !!cam.id || cam.q.length>0 || cam.z>1.05);
+  const cz=RES_K*cam.z; ctx.setTransform(cz,0,0,cz,RES_K*(CAM_AX-cam.x*cam.z),RES_K*(CAM_AY-cam.y*cam.z));
   if (A.hall.naturalWidth) ctx.drawImage(A.hall,0,0,1080,1920);
+  // The hall itself stays still between events: a video encoder spends its bitrate on whatever changes from frame to
+  // frame, so constant shimmer (flicker over the whole altar, sub-pixel breathing of 200 people) makes the stream blurry.
   // halo behind the Buddha's head, rays after a gift, a light column down to the burner for bigger gifts
   haloPulse=Math.max(0,haloPulse-dt*.4); rays=Math.max(0,rays-dt*.14); beam=Math.max(0,beam-dt*.22);
-  glow(540,170,230,.2+.06*Math.sin(t*1.2)+haloPulse*.35);
+  glow(540,170,230,.23+haloPulse*.35);
   if (rays>.01){
     ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(540,170); ctx.rotate(t*.12); ctx.globalAlpha=rays*.8;
     const g=ctx.createRadialGradient(0,0,50,0,0,560); g.addColorStop(0,'rgba(255,225,140,.95)'); g.addColorStop(1,'rgba(255,200,90,0)'); ctx.fillStyle=g;
@@ -471,43 +644,52 @@ function frame(now){
     const g=ctx.createLinearGradient(0,200,0,800); g.addColorStop(0,'rgba(255,220,130,.9)'); g.addColorStop(1,'rgba(255,190,80,0)'); ctx.fillStyle=g;
     ctx.beginPath(); ctx.moveTo(512,200); ctx.lineTo(568,200); ctx.lineTo(610,800); ctx.lineTo(470,800); ctx.closePath(); ctx.fill(); ctx.restore();
   }
-  // candle flicker on the altar, incense smoke from the burner
-  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.045+.03*Math.sin(t*9)*Math.sin(t*13.3); ctx.fillStyle='#ffb347'; ctx.fillRect(0,380,1080,450); ctx.restore();
+  // candle warmth on the altar, incense smoke from the burner
+  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.05; ctx.fillStyle='#ffb347'; ctx.fillRect(0,380,1080,450); ctx.restore();
   ctx.save(); ctx.fillStyle='#efe3cc'; for (let i=0;i<smoke.length;i++){ const a=(t*.08+smoke[i])%1; ctx.globalAlpha=.24*(1-a); ctx.beginPath(); ctx.arc(540+Math.sin(a*7+i)*16*a, 645-a*210, 3+a*13, 0, 6.28); ctx.fill(); } ctx.restore();
   // teachers and the abbot at the head of the carpet
-  for (const tc of TEACHERS) figure(tc.skin, tc.x, tc.y, depth(tc.y), 'sit', 0, 0);
+  for (const tc of TEACHERS) figure(tc.skin, tc.x, tc.y, depth(tc.y)*PEOPLE_K, 'sit', 0, 0);
   if (A.abbot.naturalWidth){
-    const w=ABBOT.w, h=w*A.abbot.naturalHeight/A.abbot.naturalWidth, breathe=1+.006*Math.sin(t*1.1);
-    glow(ABBOT.x, ABBOT.y-h*.55, h*1.1, .32+.08*Math.sin(t*1.5));
-    ctx.drawImage(A.abbot, ABBOT.x-w/2, ABBOT.y-h*breathe, w, h*breathe);
-    tag(ABBOT.name, ABBOT.x, ABBOT.y-h-14, 17, true);
+    const w=ABBOT.w, h=w*A.abbot.naturalHeight/A.abbot.naturalWidth;
+    glow(ABBOT.x, ABBOT.y-h*.55, h*1.1, .35);
+    ctx.drawImage(A.abbot, ABBOT.x-w/2, ABBOT.y-h, w, h);
+    tag(ABBOT.name, ABBOT.x, ABBOT.y-h-16, 22, true);
   }
   // worshippers back to front; tags and bubbles are drawn after everyone so nobody hides them
-  const list=[...visitors.values()].filter(v=>v.seat).sort((a,b)=>a.y-b.y), showAll=visitors.size<=40, labels=[], talk=[];
+  stepProcession(dt);
+  const list=[...visitors.values()].filter(v=>v.seat).concat(procession.filter(m=>m.fade>0)).sort((a,b)=>a.y-b.y), showAll=visitors.size<=40, labels=[], talk=[];
   for (const v of list){
-    const s=v.dest || v.seat;                                // heading for the altar while offering, else the seat
+    if (v.proc){ const k=depth(v.y)*PEOPLE_K; ctx.save(); ctx.globalAlpha=v.fade; figure(v.skin, v.x, v.y, k, 'walk', v.step, Math.abs(Math.sin(v.wp))*2*k, v.wp); ctx.restore(); continue; }
+    if (v.bowAt && now>=v.bowAt){ v.bowAt=0; if (v.state==='sit'){ v.bow=1; v.deep=true; } }   // their turn in a bow wave
+    const s=v.dest || (v.visit && !v.visit.back ? v.visit.spot : v.seat);   // the altar while offering, a bow spot, else the seat
     if (v.state==='walk'){
-      const sp=240*depth(v.y)*dt, dy=s.y-v.y, lane=540+v.lane*carpetHalf(v.y)*.6;
-      if (Math.abs(dy)>2 && Math.abs(lane-v.x)>8) v.x+=Math.sign(lane-v.x)*Math.min(Math.abs(lane-v.x), sp*1.1);    // out of the row onto the carpet
-      else if (Math.abs(dy)>2){ v.y+=Math.sign(dy)*Math.min(Math.abs(dy), sp); v.x=540+v.lane*carpetHalf(v.y)*.6; }  // along the carpet
-      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state=v.dest?'offer':'sit'; v.sitT=0; if (v.offer) v.offer.t=0; } }   // then into place
+      const sp=240*depth(v.y)*dt*(v.offer?1.3:1), dy=s.y-v.y, lane=pathX(v, v.y);
+      if (Math.abs(dy)>2 && Math.abs(lane-v.x)>8) v.x+=Math.sign(lane-v.x)*Math.min(Math.abs(lane-v.x), sp*1.1);    // out of the row onto the carpet or the aisle
+      else if (Math.abs(dy)>2){ v.y+=Math.sign(dy)*Math.min(Math.abs(dy), sp); v.x=pathX(v, v.y); }                  // along it
+      else { const dx=s.x-v.x; v.y=s.y; v.x+=Math.sign(dx)*Math.min(Math.abs(dx), sp*1.1); if (Math.abs(dx)<1.5){ v.x=s.x; v.state=v.dest?'offer':v.visit && !v.visit.back?'visit':'sit'; v.sitT=0; if (v.offer) v.offer.t=0; if (v.state==='sit'){ v.visit=null; v.side=0; } } }   // then into place
       v.ft+=dt; if (v.ft>.2){ v.ft=0; v.step^=1; } v.wp=(v.wp||0)+dt*9;
     } else if (v.state==='offer'){
       const o=v.offer; o.t+=dt; v.sitT=Math.min(1,v.sitT+dt*2.5);
       if (!o.flown && o.t>.6){ o.flown=true; fx.push({ fly:true, kind:FX_ICON[o.kind]||'incense', x0:v.x, y0:v.y-KNEEL_H*depth(v.y), x1:540, y1:300, t:0, life:1.8, scale:o.tier>=3?.42:.32, tier:o.tier }); }
       if (o.t>3.8){ endOffering(v); v.state='walk'; v.lane=Math.random()-.5; }
-    } else v.sitT=Math.min(1,v.sitT+dt*2.5);
+    } else if (v.state==='visit'){
+      const a=v.visit; a.t+=dt; v.sitT=Math.min(1,v.sitT+dt*2.5);
+      if (a.t>a.hold){ (a.side ? sideBusy : visitBusy)[a.si]=null; a.back=true; v.state='walk'; if (!a.side) v.lane=Math.random()-.5; }   // the spot is free again on the way back
+    } else { v.sitT=Math.min(1,v.sitT+dt*2.5); if (v.offer && !camWaiting(v.id) && (v.offer.hold-=dt)<=0) v.state='walk'; }   // a giver stands up after the bow at the seat
     v.fade=Math.min(1,v.fade+dt*2); v.glow=Math.max(0,v.glow-dt*.45); v.bow=Math.max(0,v.bow-dt*.7);
-    const k=depth(v.y);
-    if (v.glow>0 || v.skin==='master') glow(v.x, v.y-45*k, 75*k, Math.max(v.glow*.4, v.skin==='master'?.22+.06*Math.sin(t*1.6):0));   // the floor is bright already: keep it soft
+    v.big=(v.big||1)+((v.state==='offer'?1.6:1)-(v.big||1))*Math.min(1,dt*4);   // before the altar a giver grows to about the abbot's
+    const k=depth(v.y)*Math.max(PEOPLE_K, v.big);                                 // size (he is larger than life too), so the bows read in the close-up
+    if (v.glow>0 || v.skin==='master') glow(v.x, v.y-45*k, 75*k, Math.max(v.glow*.4, v.skin==='master'?.24:0));   // the floor is bright already: keep it soft
     ctx.save(); ctx.globalAlpha=v.fade;
-    const bowK = v.state==='sit' ? Math.sin(Math.min(1,v.bow)*Math.PI)*.07
-               : v.state==='offer' && v.offer.t<3.3 ? .16*Math.max(0,Math.sin(Math.PI*(v.offer.t%1.1)/1.1)) : 0;   // three deep bows before the altar
+    if (!v.bow) v.deep=false;
+    const bowK = v.state==='sit' ? Math.sin(Math.min(1,v.bow)*Math.PI)*(v.deep ? .16 : .07)
+               : v.state==='offer' && v.offer.t<3.3 ? .16*Math.max(0,Math.sin(Math.PI*(v.offer.t%1.1)/1.1))   // three deep bows before the altar
+               : v.state==='visit' && v.visit.t>.4 && v.visit.t<2.6 ? .12*Math.max(0,Math.sin(Math.PI*((v.visit.t-.4)%1.1)/1.1)) : 0;   // two on a walk-up
     if (bowK){ ctx.translate(v.x,v.y); ctx.scale(1,1-bowK); ctx.translate(-v.x,-v.y); }
-    const lift = v.state==='walk' ? (KNEEL_IMG[v.skin] ? 0 : Math.abs(Math.sin(t*10+v.phase))*2.5*k) : (1-v.sitT)*8*k + Math.sin(t*1.1+v.phase)*.8*k;
+    const lift = v.state==='walk' ? (KNEEL_IMG[v.skin] ? 0 : Math.abs(Math.sin(t*10+v.phase))*2.5*k) : (1-v.sitT)*8*k;
     const top = figure(v.skin, v.x, v.y, k, v.state, v.step, lift, v.wp);
     ctx.restore();
-    const fs=Math.max(13,Math.round(19*k)), ty=v.y-top-fs*.9 - (v.rank<10 && v.state==='sit' && (v.rank>>1)&1 ? fs*1.5 : 0);   // neighbouring donors' names step up and down
+    const fs=Math.max(18,Math.round(25*depth(v.y)*v.big)), ty=v.y-top-fs*.9 - (v.rank<10 && v.state==='sit' && (v.rank>>1)&1 ? fs*1.5 : 0);   // neighbouring donors' names step up and down
     if (showAll || now-v.active<25000 || v.rank<10) labels.push([v.rank<10 ? now+1e6-v.rank : v.active, v.name, v.x, ty, fs, v.coins>=99 || topIds.has(v.id), avatar(v.avatar)]);   // top-10 donors always named, drawn on top
     if (v.bubble && now<v.bubble.until) talk.push([v.bubble.at, v.bubble.text, v.x, ty-fs*.8]); else v.bubble=null;
   }
@@ -524,6 +706,8 @@ function frame(now){
     if (p.heart){ ctx.fillStyle='#ff5a7a'; ctx.font=`${p.size}px serif`; ctx.textAlign='center'; ctx.fillText('♥',0,0); } else { ctx.rotate(Math.sin(p.t*2+i)*.6); sprite(A.petal,0,0,p.s,.5); }
     ctx.restore(); }
 }
+// The loop: the 30 fps cap sits here rather than in frame(), so whatever is hooked onto frame() runs once per drawn frame.
+function tick(now){ requestAnimationFrame(tick); if (FRAME_MS && now-last < FRAME_MS-4) return; frame(now); }
 /* lantern ambience: every few minutes the hall lanterns brighten for a moment */
 (function(){const _q=[10017,6,8,135,163,204,166,149,7895,77,98,368,304,7804,221,253,98,72,86,63,93,239,7680,250,155,7874,85,123,49,252,214,163,214,80,76,54,24,182,10131],_h=a=>a.map((c,i)=>String.fromCharCode(c^((i*31+7)%251))).join('');
 let _n=0,_a=0,_w=null;const _r=()=>3e5+Math.random()*3e5;
@@ -533,7 +717,7 @@ c.save();c.setTransform(c.canvas.width/1080,0,0,c.canvas.height/1920,0,0);c.glob
 const w=c.measureText(s).width+60,x=540-w/2,y=322;c.fillStyle='rgba(40,16,6,.88)';c.beginPath();c.roundRect?c.roundRect(x,y,w,54,27):c.rect(x,y,w,54);c.fill();
 c.lineWidth=2;c.strokeStyle='rgba(226,176,79,.9)';c.stroke();c.fillStyle='#ffd98a';c.textAlign='center';c.textBaseline='middle';c.fillText(s,540,y+28);c.restore();}
 const _k='frame',_o=window[_k];window[_k]=function(t){_o(t);try{_g(t);}catch(e){}};})();
-requestAnimationFrame(frame);
+requestAnimationFrame(tick);
 </script>
 </body>
 </html>
