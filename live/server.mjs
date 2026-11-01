@@ -149,9 +149,15 @@ function onGift(id, name, giftName, count, diamonds, avatar){
   const d = donors.get(id) || { id, name: v.name, coins: 0 }; d.name = v.name; d.coins += coins; donors.set(id, d);
   const prayer = (v.lastText && Date.now() - v.lastTextAt < 90_000 && v.lastText.length > 6) ? v.lastText : pickPrayer();
   const tier = coins >= 99 ? 3 : coins >= 10 ? 2 : 1;
-  const line = `Nam mô A Di Đà Phật. Phật tử ${spoken(v.name)} thành tâm dâng ${giftName}${count > 1 ? ', ' + count + ' lần' : ''}. ${prayer}.`;
   broadcast({ t:'gift', id, name: v.name, giftName, count, coins, total: v.coins, tier, prayer, kind, label: OFFER_LABEL[kind], stats, top: topDonors() });
-  if (settings.gifts.readAll || coins >= settings.gifts.minDiamonds) say(line, { tag:'gift', id });
+  if (!settings.gifts.readAll && coins < settings.gifts.minDiamonds) return;
+  giftTimes.push(Date.now()); while (Date.now() - giftTimes[0] > 20_000) giftTimes.shift();
+  const rush = giftTimes.length > 1 || voiceQueued() > 0 || voiceEnd > Date.now();   // another gift lately, or it has to wait
+  const w = giftWait.find(g => g.id === id && g.giftName === giftName);   // the same gift again before it was read: one entry
+  if (w){ w.count += count; w.coins += coins; w.prayer = prayer; }
+  else if (giftWait.length < 60) giftWait.push({ id, name: v.name, giftName, count, coins, prayer, rush });
+  else { addLog('Hàng đợi giọng đọc đầy, bỏ qua 1 lượt quà'); return; }
+  pumpTTS();
 }
 
 function pickPrayer(){
@@ -162,41 +168,78 @@ function pickPrayer(){
 const spoken = s => String(s).replace(/[_@.]+/g, ' ').replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim() || 'ẩn danh';
 
 /* ------------------------------------------------------------------ TTS */
-// Lines are made up to two at a time (the next one is ready when the current one ends) but always go out in order.
+// The overlay plays lines one after another. A line's words are fixed only when the line playing is about to end (the
+// server knows how long each lasts from its audio size, and how long Edge takes to make one), so gifts that come in
+// meanwhile wait together and are read in one short line. One full line per gift is ~11 s: in a rush the fourth donor
+// heard their name half a minute late. Up to two lines are made at a time and always go out in order.
 const ttsQueue = []; let ttsHead = false, ttsSeq = 0;
-const ttsCache = new Map();          // voice|pitch|rate|text -> url, for the chants that come back every few minutes
+const making = [];                   // lines whose voice is being made, in the order they go out
+const giftWait = [];                 // gifts not read yet: { id, name, giftName, count, coins, prayer, rush }
+const giftTimes = [];                // when the gifts of the last 20 s came in
+let voiceEnd = 0;                    // when the overlay should be done with every line sent so far
+let makeMs = 3000;                   // how long Edge has lately taken to make a line
+let pumpTimer = null;
+const LINE_GAP = 450;                // the overlay's pause between lines plus fetch and decode
+const estSec = text => (1.2 + text.length * .095) * .8 / (1 + settings.rate / 100);   // measured on NamMinh at -20%
+const audioSec = (buf, ext) => ext === 'wav' ? (buf.length - 44) / (buf.readUInt32LE(28) || 32000) : buf.length / 12000;   // Edge mp3 is a constant 96 kbit/s
+const played = sec => { voiceEnd = Math.max(Date.now(), voiceEnd) + sec * 1000 + LINE_GAP; };
+const voiceQueued = () => ttsQueue.length + making.length + (giftWait.length ? 1 : 0);
+const ttsCache = new Map();          // voice|pitch|rate|text -> { url, sec }, for the chants that come back every few minutes
 function esc(s){ return String(s).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c])); }
 function say(text, meta = {}){
   if (ttsQueue.length >= 15) { addLog('Hàng đợi giọng đọc đầy, bỏ qua 1 câu'); return; }
-  const it = { text: String(text).slice(0, 500), meta };
-  const at = meta.tag === 'gift' ? ttsQueue.findIndex(x => !x.job && x.meta.tag !== 'gift') : -1;   // a gift goes ahead of greetings and chants not yet being made
-  if (at >= 0) ttsQueue.splice(at, 0, it); else ttsQueue.push(it);
+  ttsQueue.push({ text: String(text).slice(0, 500), meta });
   pumpTTS();
 }
 function pumpTTS(){
-  for (const it of ttsQueue.slice(0, 2)) if (!it.job){ it.job = makeVoice(it.text, it.meta.tag); it.job.catch(() => {}); }   // a failure is logged when its turn comes; unhandled it would stop Node
-  if (ttsHead || !ttsQueue.length) return; ttsHead = true;
-  const it = ttsQueue[0];
-  it.job.then(url => broadcast({ t:'tts', url, text: it.text, ...it.meta }), e => addLog('TTS lỗi: ' + (e?.message || e)))
-    .finally(() => { ttsQueue.shift(); ttsHead = false; pumpTTS(); });
+  clearTimeout(pumpTimer); pumpTimer = null;
+  while (making.length < 2 && (giftWait.length || ttsQueue.length)){
+    const end = making.reduce((t, it) => t + (it.sec ?? estSec(it.text)) * 1000 + LINE_GAP, Math.max(Date.now(), voiceEnd));
+    const wait = end - Date.now() - makeMs - 1200;
+    if (wait > 0){ pumpTimer = setTimeout(pumpTTS, Math.min(wait, 5000)); break; }
+    const it = giftWait.length ? giftLine() : ttsQueue.shift();   // gifts go ahead of every other line still waiting
+    it.job = makeVoice(it.text, it.meta.tag).then(v => (it.sec = v.sec, v));
+    it.job.catch(() => {});          // a failure is logged when its turn comes; unhandled it would stop Node
+    making.push(it);
+  }
+  if (ttsHead || !making.length) return; ttsHead = true;
+  const it = making[0];
+  it.job.then(({ url, sec }) => { broadcast({ t:'tts', url, text: it.text, ...it.meta }); played(sec); }, e => addLog('TTS lỗi: ' + (e?.message || e)))
+    .finally(() => { making.shift(); ttsHead = false; pumpTTS(); });
+}
+// One line for the gifts waiting, up to six donors. A big gift (99 coins or more) is read first, with its prayer. A lone
+// gift gets its prayer only when the room is calm; one that came in a rush gets the name and the gift, and the prayer stays
+// on screen. Several are named together, grouped by gift, with commas (each full stop is a ~1.2 s pause); the rest wait
+// for the next line.
+function giftLine(){
+  const at = giftWait.findIndex(g => g.coins >= 99), big = at >= 0 ? giftWait.splice(at, 1)[0] : null;
+  const rest = giftWait.splice(0, big ? 5 : 6);
+  const one = (g, prayer) => `Phật tử ${spoken(g.name)} thành tâm dâng ${g.giftName}${g.count > 1 ? `, ${g.count} lần` : ''}.${prayer ? ` ${g.prayer}.` : ''}`;
+  const byGift = new Map(); for (const g of rest) byGift.set(g.giftName, [...(byGift.get(g.giftName) || []), g]);
+  const group = ([gift, gs]) => `Phật tử ${joinNames(gs.map(g => spoken(g.name)))} dâng ${gift}${gs.length === 1 && gs[0].count > 1 ? ` ${gs[0].count} lần` : ''}`;
+  const others = rest.length === 1 ? one(rest[0], !big && !rest[0].rush) : rest.length ? [...byGift].map(group).join(', ') + '.' : '';
+  const n = rest.length + (big ? 1 : 0); if (n > 1) addLog(`Giọng đọc: gộp ${n} lượt quà vào một câu`);
+  return { text: `Nam mô A Di Đà Phật. ${big ? one(big, true) + ' ' : ''}${others}`.trim(), meta: { tag:'gift', id: (big || rest[0]).id } };
 }
 async function makeVoice(text, tag){
   const key = `${settings.voice}|${settings.pitch}|${settings.rate}|${text}`;
   const hit = ttsCache.get(key);
-  if (hit && fs.existsSync(path.join(TTS_DIR, path.basename(hit)))) return hit;
-  let buf, ext = 'mp3';
+  if (hit && fs.existsSync(path.join(TTS_DIR, path.basename(hit.url)))) return hit;
+  let buf, ext = 'mp3'; const t0 = Date.now();
   try { buf = await edgeSpeak(text); }
   catch (e) {
     if (!settings.ttsFallback) throw e;
     buf = await offlineSpeak(text); ext = 'wav';
     addLog(`Giọng đọc: Microsoft lỗi ${TTS_TRIES} lần, đọc bằng giọng dự phòng của Windows`);
   }
+  const ms = Date.now() - t0;        // follow a slowdown at once, a recovery slowly
+  makeMs = Math.min(15000, Math.max(500, ms > makeMs ? (makeMs + ms) / 2 : makeMs * .8 + ms * .2));
   const file = `${tag === 'chant' ? 'chant' : 'tts'}_${Date.now()}_${++ttsSeq}.${ext}`;
   fs.writeFileSync(path.join(TTS_DIR, file), buf);
-  const url = `/live/tts/${file}`;
-  if (tag === 'chant' && ext === 'mp3') ttsCache.set(key, url);
+  const v = { url: `/live/tts/${file}`, sec: audioSec(buf, ext) };
+  if (tag === 'chant' && ext === 'mp3') ttsCache.set(key, v);
   const old = fs.readdirSync(TTS_DIR).filter(f => f.startsWith('tts_')).sort(); while (old.length > 40) { try { fs.unlinkSync(path.join(TTS_DIR, old.shift())); } catch {} }
-  return url;
+  return v;
 }
 // Edge TTS often takes the request, then drops the connection (code 1006) ~2.5 s later without any audio: more than half of
 // the requests some evenings. So a failed request is sent again at once, and when one is slow a second one starts beside
@@ -320,7 +363,7 @@ function giveTeaching(){
   if (!teachQueue.length || Date.now() - lastTeachAt < 12_000) return;
   const q = teachQueue.shift(), text = TEACHINGS[teachIdx++ % TEACHINGS.length]; lastTeachAt = Date.now();
   broadcast({ t:'teach', id: q.id, name: q.name, text });
-  if (ttsQueue.length < 2) say(`Lời Phật dạy cho Phật tử ${spoken(q.name)}. ${text}`, { tag:'teach' });
+  if (voiceQueued() < 2) say(`Lời Phật dạy cho Phật tử ${spoken(q.name)}. ${text}`, { tag:'teach' });
 }
 setInterval(giveTeaching, 2000);
 
@@ -341,15 +384,16 @@ function dedicate(){
 const announce = { greet: [], follow: [], share: [], badge: [] };
 const queueName = (kind, item) => { if (announce[kind].length < 50) announce[kind].push(item); };
 function welcome(v){ if (settings.greet && !v.demo) queueName('greet', v.name); }
+const joinNames = names => names.length > 1 ? `${names.slice(0, -1).join(', ')} và ${names.at(-1)}` : names[0];
 const nameList = names => {
   names = [...new Set(names.map(spoken))]; const shown = names.slice(0, 4), rest = names.length - shown.length;
-  return rest > 0 ? `${shown.join(', ')} và ${rest} Phật tử khác` : shown.length > 1 ? `${shown.slice(0, -1).join(', ')} và ${shown.at(-1)}` : shown[0];
+  return rest > 0 ? `${shown.join(', ')} và ${rest} Phật tử khác` : joinNames(shown);
 };
 setInterval(() => {
   if (!settings.greet) announce.greet.length = 0;
   if (!settings.thankSocial){ announce.follow.length = 0; announce.share.length = 0; }
   if (!settings.badges) announce.badge.length = 0;
-  if (ttsQueue.length) return;
+  if (voiceQueued()) return;
   const parts = [];
   if (announce.greet.length) parts.push(`Hoan hỷ chào đón Phật tử ${nameList(announce.greet.splice(0))} vào chánh điện.`);
   if (announce.follow.length) parts.push(`Cảm ơn Phật tử ${nameList(announce.follow.splice(0))} đã theo dõi chánh điện.`);
@@ -452,10 +496,10 @@ function startQuiz(){
   const [q, ...opts] = QUIZ[quizOrder[quizIdx++ % QUIZ.length]], order = [0, 1, 2].sort(() => Math.random() - .5);
   const qz = quiz = { q, options: order.map(i => opts[i]), right: order.indexOf(0), ready: false, answers: new Map() };
   const text = `Câu đố Phật pháp. ${q} A, ${qz.options[0]}. B, ${qz.options[1]}. C, ${qz.options[2]}. Mời đại chúng bình luận A, B hoặc C.`;
-  const go = url => {
+  const go = voice => {
     if (qz.ready || quiz !== qz) return; qz.ready = true; lastQuizAt = Date.now();
     broadcast({ t:'quiz', q, options: qz.options, endsAt: Date.now() + QUIZ_SEC * 1000 });
-    if (url) broadcast({ t:'tts', url, text, tag:'quiz' });
+    if (voice){ broadcast({ t:'tts', url: voice.url, text, tag:'quiz' }); played(voice.sec); }
     setTimeout(endQuiz, QUIZ_SEC * 1000);
   };
   addLog(`❓ Câu đố: ${q}`);
