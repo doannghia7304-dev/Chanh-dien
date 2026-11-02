@@ -2,6 +2,8 @@
 
 Chánh điện online 2.5D cho TikTok LIVE. Mỗi người xem bình luận là bước vào chánh điện, ngồi xuống bồ đoàn tụng kinh. Ai tặng quà sẽ được xướng tên hồi hướng bằng giọng đọc tiếng Việt. Có nhạc thiền, chuông, mõ và đọc kinh định kỳ.
 
+Mới dùng lần đầu? Đọc [HUONG-DAN.md](HUONG-DAN.md): giới thiệu và hướng dẫn từng bước, không cần biết lập trình.
+
 Mã nguồn chia sẻ miễn phí (MIT). Có hai phần:
 
 | Thư mục | Là gì |
@@ -21,7 +23,7 @@ npm start
 
 1. Mở `http://localhost:3000/live/control.html` (bảng điều khiển).
 2. Trong TikTok LIVE Studio: *Add source → Link*, dán `http://localhost:3000/live/overlay.html`, bật độ phân giải tùy chỉnh và đặt 1080×1920 (mặc định là 800×600: phải phóng to gần 4 lần, hình sẽ rất mờ). Chip **Overlay** trên bảng điều khiển hiện kích thước thật của nguồn Link và cảnh báo nếu chưa đúng. Với OBS thì dùng *Browser source* cùng địa chỉ và kích thước. Cách này nét nhất và tự phát tiếng. Không nên dùng *Window capture*: cửa sổ trình duyệt thấp hơn 1920 px nên hình bị phóng to, mờ, và dính thanh địa chỉ.
-3. Chỉ một overlay phát tiếng: nguồn Link được ưu tiên, các cửa sổ overlay khác (ví dụ **Mở màn hình overlay 9:16** để xem thử) tự im lặng nên không bị vọng tiếng. Chip **Overlay** trên bảng điều khiển cho biết tiếng đang phát ở đâu. Điện thoại cắt bớt hai mép khi xem LIVE; nếu mép cảnh bị mất, giảm **Kích thước khung hình** (mặc định 90%) trong bảng điều khiển.
+3. Chỉ một overlay phát tiếng: nguồn Link được ưu tiên, các cửa sổ overlay khác (ví dụ **Mở màn hình overlay 9:16** để xem thử) tự im lặng nên không bị vọng tiếng. Chip **Overlay** trên bảng điều khiển cho biết tiếng đang phát ở đâu. Chánh điện luôn phủ kín khung 1080×1920 và được vẽ đúng từng điểm ảnh cho nét. Điện thoại cắt bớt hai mép khi xem LIVE, nên các bảng chữ được thu vào giữa theo **Khung bảng chữ** (mặc định 90%); nếu mép bảng bị mất, chọn nhỏ hơn.
 4. Bật LIVE trên TikTok, nhập `@username` vào bảng điều khiển, bấm **Kết nối**.
 
 Chưa live vẫn thử được: dùng **Thử tương tác**, **Đổ người mẫu 30/80/150/200** hoặc **Bot mô phỏng**.

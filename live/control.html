@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bảng điều khiển · Chánh Điện Tịnh Tâm</title>
+<script>if (location.protocol === "file:") location.replace("http://localhost:3000/live/control.html");   // opened by double-clicking the file: it only works through the server</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
 <style>
 /* Layout: three columns of cards (connection · interaction · sound/scene) over a status bar; collapses to one column on narrow windows. */
@@ -75,8 +76,8 @@ button.red{background:var(--red);border-color:#b84a33}
     <div class="row"><button id="btnChat">Gửi bình luận</button></div>
     <div class="row">
       <button data-gift="Hoa hồng" data-dia="1">Dâng hương · 1</button>
-      <button data-gift="Nén hương" data-dia="5">Lễ Phật · 5</button>
-      <button data-gift="Đèn hoa sen" data-dia="30">Hoa sen · 30</button>
+      <button data-gift="Cỏ bốn lá" data-dia="10">Lễ Phật · 10</button>
+      <button data-gift="Thả tim" data-dia="100">Hoa sen · 100</button>
     </div>
     <p class="hint">Gõ <b>nam · nữ · ông · bà · sư · ni · tiểu · cao tăng</b> làm bình luận để đổi hình. Quà dưới 10 xu (Hoa hồng) tính là Dâng hương, 10–99 xu (Cỏ bốn lá) là Lễ Phật, từ 100 xu (Thả tim) là Hoa sen.</p>
     <h2>Đổ người mẫu</h2>
@@ -121,8 +122,8 @@ button.red{background:var(--red);border-color:#b84a33}
       <label>Số chỗ ngồi<select id="seatMode"><option value="auto">200 (tối đa)</option><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="200">200</option></select></label>
       <label>Khóa lễ (phút)<input id="sessionMin" type="number" min="5" max="240" value="60"></label>
     </div>
-    <label>Kích thước khung hình<select id="frameSize"><option value="100">100% (sát mép)</option><option value="95">95%</option><option value="90">90%</option><option value="85">85%</option><option value="80">80%</option><option value="75">75%</option><option value="70">70%</option></select></label>
-    <p class="hint">Điện thoại cắt bớt hai mép khi xem LIVE nên cảnh trông bị phóng to. Nếu mép bảng đếm hay tên người bị mất, chọn nhỏ hơn. Phần viền dư được phủ bằng nền chánh điện làm mờ.</p>
+    <label>Khung bảng chữ<select id="frameSize"><option value="100">100% (sát mép)</option><option value="95">95%</option><option value="90">90%</option><option value="85">85%</option><option value="80">80%</option><option value="75">75%</option><option value="70">70%</option></select></label>
+    <p class="hint">Chánh điện luôn phủ kín khung hình cho nét. Điện thoại cắt bớt hai mép khi xem LIVE, nên các bảng chữ (đồng hồ, bảng giá, lời mời, Tấm Lòng Thành) được thu vào giữa theo tỉ lệ này. Nếu mép bảng bị mất, chọn nhỏ hơn.</p>
     <label>Người đi lại<select id="bustle"><option value="0">Yên tĩnh (chỉ người mới vào và người tặng quà)</option><option value="1">Thỉnh thoảng</option><option value="2">Nhộn nhịp</option><option value="3">Rất nhộn nhịp</option></select></label>
     <p class="hint">Người trong chánh điện lần lượt đứng dậy đi lạy rồi về chỗ: người giữa theo thảm đỏ, người hai bên theo hai lối đi bên. Đông người thì nhiều người đi cùng lúc hơn.</p>
     <label>Cỡ người<select id="peopleSize"><option value="100">100%</option><option value="110">110%</option><option value="120">120% (đông đúc)</option><option value="130">130%</option><option value="140">140%</option></select></label>

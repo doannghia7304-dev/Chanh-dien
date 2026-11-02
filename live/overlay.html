@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Overlay 9:16 · Chánh Điện Tịnh Tâm</title>
+<script>if (location.protocol === "file:") location.replace("http://localhost:3000/live/overlay.html");   // opened by double-clicking the file: it only works through the server</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,500;0,700;1,400&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
 <style>
 /* Overlay for TikTok LIVE Studio / OBS window capture. Everything sits on a 1080×1920 stage scaled to the window. */
@@ -16,10 +17,10 @@
 html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--body);color:var(--fg)}
 [hidden]{display:none!important}
 #fit{position:fixed;inset:0;overflow:hidden}
-/* when the stage is shrunk (frame size < 100%) the margin shows the hall again, blurred and dimmed; it never moves */
-#backdrop{position:absolute;inset:-60px;background:#000 url(/assets/grand_hall.jpg) center/cover;filter:blur(22px) brightness(.45)}
 #stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center;overflow:hidden;background:var(--bg)}
 #c{position:absolute;inset:0;width:1080px;height:1920px}
+/* the panels sit on their own layer, shrunk toward the centre by the frame size setting so phones do not crop them */
+#hud{position:absolute;inset:0;transform-origin:center center}
 .ui{position:absolute;z-index:3}
 .panel{background:linear-gradient(180deg,rgba(48,21,8,.88),rgba(20,9,4,.88));border:2px solid var(--line);border-radius:20px;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 /* top-right: session countdown + offering counters (top-left belongs to TikTok's own header) */
@@ -126,8 +127,9 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 </style>
 </head>
 <body>
-<div id="fit"><div id="backdrop"></div><div id="stage">
+<div id="fit"><div id="stage">
   <canvas id="c" width="1080" height="1920"></canvas>
+  <div id="hud">
   <div id="offer" class="panel ui">
     <div id="title">Chánh Điện Tịnh Tâm</div>
     <div id="subtitle">Nam Mô A Di Đà Phật</div>
@@ -159,14 +161,18 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
   <div id="gift" class="ui"><div class="who" id="giftWho"></div><div class="what" id="giftWhat"></div><div class="pray" id="giftPray"></div></div>
   <button id="unmute">🔔 Bấm để bật âm thanh</button>
   <div id="conn">đang kết nối…</div>
+  </div>
 </div></div>
 
 <script>
 /* ======================= stage fit ======================= */
 const stage = document.getElementById('stage');
-let FRAME_K = .9;            // frame size setting: phones crop the sides of a LIVE, so the stage can leave a margin
-const stageScale = () => Math.min(innerWidth/1080, innerHeight/1920) * FRAME_K;
-function fit(){ stage.style.transform = `translate(-50%,-50%) scale(${stageScale()})`; }
+// The hall always fills the frame and is drawn pixel for pixel, so the LIVE stays sharp. Phones crop the sides of a LIVE,
+// so the frame size setting only moves the panels in (they used to shrink the whole stage inside a blurred copy of the
+// hall, which looked like a frame off its place and softened every pixel).
+let FRAME_K = .9;
+const stageScale = () => Math.min(innerWidth/1080, innerHeight/1920);
+function fit(){ stage.style.transform = `translate(-50%,-50%) scale(${stageScale()})`; document.getElementById("hud").style.transform = FRAME_K < 1 ? `scale(${FRAME_K})` : ""; }
 addEventListener('resize', fit); fit();
 const $ = id => document.getElementById(id);
 
@@ -634,7 +640,7 @@ function connect(){
 function applySettings(){
   $('title').textContent=settings.title||'Chánh Điện Tịnh Tâm';
   $('subtitle').textContent=settings.subtitle||'Nam Mô A Di Đà Phật';
-  const fk=(settings.frameSize||100)/100; if (fk!==FRAME_K){ FRAME_K=fk; fit(); sizeCanvas(); }
+  const fk=(settings.frameSize||100)/100; if (fk!==FRAME_K){ FRAME_K=fk; fit(); }
   PEOPLE_K=(settings.peopleSize||120)/100; setGoal(); setActs();
   { const tips=inviteTips(); $('inviteTip').textContent = tips[inviteIdx % tips.length]; }
   duck(false); scheduleMo();

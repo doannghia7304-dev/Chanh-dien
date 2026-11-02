@@ -33,7 +33,7 @@ const settings = {
   autoChant: true, chantEveryMin: 3,
   sessionMin: 60,                    // countdown of one "khóa lễ"; when it ends: bell + chant, then it restarts
   seatMode: 'auto',                  // auto (200) | 50 | 100 | 150 | 200
-  frameSize: 90,                     // % of the window the 9:16 stage fills; phones crop the edges of a LIVE, so leave a margin
+  frameSize: 90,                     // % the overlay's panels shrink toward the centre; phones crop the edges of a LIVE
   bustle: 2,                         // people getting up to bow before the altar: 0 none, 1 a few, 2 lively, 3 busy
   peopleSize: 120,                   // % size of the worshippers against their seat spacing: bigger reads as a fuller hall
   procession: true,                  // monks walk in procession down and up the side aisles with each periodic chant
